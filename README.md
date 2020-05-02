@@ -11,6 +11,6 @@ https://play.google.com/store/apps/details?id=appinventor.ai_poddarrupak2808.Rup
 - Couple of motors and wheels
 - Arduino board
 - HC05 Bluetooth module
-- Motor driver with PWM speed control
+- DUAL Motor driver with PWM speed control
 - Jumper wires
 - Batteries
