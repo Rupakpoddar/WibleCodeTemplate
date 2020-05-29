@@ -18,6 +18,7 @@ SoftwareSerial BTmodule(2,3); //Connect the RX pin of Bluetooth module to pin 3
 void setup() {
 Serial.begin(9600);
 BTmodule.begin(9600);
+BTmodule.setTimeout(10);
 pinMode(a1, OUTPUT);
 pinMode(a2, OUTPUT); 
 pinMode(b1, OUTPUT);

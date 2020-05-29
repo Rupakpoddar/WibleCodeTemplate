@@ -19,6 +19,7 @@ int speed = 255;  //Initial speed(0-min, 255-max)
 void setup() {
 Serial.begin(9600);
 BTmodule.begin(9600);
+BTmodule.setTimeout(10);
 pinMode(a1, OUTPUT);
 pinMode(a2, OUTPUT); 
 pinMode(b1, OUTPUT);
@@ -30,8 +31,8 @@ pinMode(state, INPUT);
 void loop() {
 if(digitalRead(state) == 1)//BT 5 ->0, BT 4->1
 {
-  String readString;
-  char temp[10];
+  String readString = "";
+  char temp[10] = "None";
   
 while (BTmodule.available()) {
 readString = BTmodule.readString();
