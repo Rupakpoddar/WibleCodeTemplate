@@ -1,4 +1,4 @@
-# Bluetooth-operated-car-with-speed-control
+# Bluetooth-operated-car
 Here you will find all the files necessary for this project
 
 watch the tutorial video at-
