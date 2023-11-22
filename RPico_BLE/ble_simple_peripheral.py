@@ -47,11 +47,13 @@ class BLESimplePeripheral:
         # Track connections so we can send notifications.
         if event == _IRQ_CENTRAL_CONNECT:
             conn_handle, _, _ = data
-            print("New connection", conn_handle)
+            # print("New connection", conn_handle)
+            print("New Connection\n")
             self._connections.add(conn_handle)
         elif event == _IRQ_CENTRAL_DISCONNECT:
             conn_handle, _, _ = data
-            print("Disconnected", conn_handle)
+            # print("Disconnected", conn_handle)
+            print("Connection Lost")
             self._connections.remove(conn_handle)
             # Start advertising again to allow a new connection.
             self._advertise()
@@ -69,7 +71,7 @@ class BLESimplePeripheral:
         return len(self._connections) > 0
 
     def _advertise(self, interval_us=500000):
-        print("Starting advertising")
+        print("Connect to 'mpy-uart'")
         self._ble.gap_advertise(interval_us, adv_data=self._payload)
 
     def on_write(self, callback):
@@ -99,3 +101,4 @@ def demo():
 
 if __name__ == "__main__":
     demo()
+    
