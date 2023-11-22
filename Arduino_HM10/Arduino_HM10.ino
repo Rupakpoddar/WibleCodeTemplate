@@ -51,10 +51,7 @@ void setup() {
   pinMode(M2A, OUTPUT);
   pinMode(M2B, OUTPUT);
 
-  analogWrite(M1A, 0);
-  analogWrite(M1B, 0);
-  analogWrite(M2A, 0);
-  analogWrite(M2B, 0);
+  _STOP();
 }
 
 void loop() {
