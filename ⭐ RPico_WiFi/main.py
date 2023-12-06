@@ -22,8 +22,8 @@ M2B = PWM(Pin(5))
 
 M1A.freq(1000)
 M1B.freq(1000)
-M1A.freq(1000)
-M1A.freq(1000)
+M2A.freq(1000)
+M2B.freq(1000)
 
 def map_range(x, in_min, in_max, out_min, out_max):
   return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
@@ -157,10 +157,10 @@ while True:
             # RIGHT
             #
             if command == "RGHT":
-                M1A.duty_u16(duty)
-                M1B.duty_u16(0)
-                M2A.duty_u16(0)
-                M2B.duty_u16(duty)
+                M1A.duty_u16(0)
+                M1B.duty_u16(duty)
+                M2A.duty_u16(duty)
+                M2B.duty_u16(0)
             
             '''    
             ### Utilize the multi-touch capability of the app from below ###
