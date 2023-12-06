@@ -148,19 +148,19 @@ while True:
             # LEFT
             #
             if command == "LEFT":
-                M1A.duty_u16(duty)
-                M1B.duty_u16(0)
-                M2A.duty_u16(0)
-                M2B.duty_u16(duty)
+                M1A.duty_u16(0)
+                M1B.duty_u16(duty)
+                M2A.duty_u16(duty)
+                M2B.duty_u16(0)
             
             #
             # RIGHT
             #
             if command == "RGHT":
-                M1A.duty_u16(0)
-                M1B.duty_u16(duty)
-                M2A.duty_u16(duty)
-                M2B.duty_u16(0)
+                M1A.duty_u16(duty)
+                M1B.duty_u16(0)
+                M2A.duty_u16(0)
+                M2B.duty_u16(duty)
             
             '''    
             ### Utilize the multi-touch capability of the app from below ###
