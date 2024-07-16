@@ -2,12 +2,16 @@
 from machine import Pin 
 import bluetooth
 from ble_simple_peripheral import BLESimplePeripheral
+import time
 
 # Create a Bluetooth Low Energy (BLE) object
 ble = bluetooth.BLE()
 
 # Create an instance of the BLESimplePeripheral class with the BLE object
 sp = BLESimplePeripheral(ble)
+
+# Set the print string time to 0.
+print_string_time = 0
 
 # Create a Pin object for the onboard LED, configure it as an output
 led = Pin("LED", Pin.OUT)
@@ -27,3 +31,13 @@ def on_rx(data):
 while True:
     if sp.is_connected():  # Check if a BLE connection is established
         sp.on_write(on_rx)  # Set the callback function for data reception
+    
+    if (time.ticks_ms() - print_string_time > 1000):
+        if sp.is_connected():
+            # Create a message string
+            msg="Hello_World!\n"
+            # Send the message via BLE
+            sp.send(msg)
+            print("Data Sent")
+        # Update the print string time    
+        print_string_time = time.ticks_ms()
