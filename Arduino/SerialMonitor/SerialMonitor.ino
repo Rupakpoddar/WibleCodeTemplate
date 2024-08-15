@@ -7,7 +7,7 @@
 #include <ArduinoBLE.h>
 
 #ifndef _WIBLE_ENABLED_
-  #error "Please install the modified ArduinoBLE library from: https://github.com/Rupakpoddar/WibleCodeTemplate/raw/master/Arduino/ArduinoBLE.zip"
+  #error "Please install the modified ArduinoBLE library from: >>> https://github.com/Rupakpoddar/WibleCodeTemplate/raw/master/Arduino/ArduinoBLE.zip <<<"
 #endif
 
 /*

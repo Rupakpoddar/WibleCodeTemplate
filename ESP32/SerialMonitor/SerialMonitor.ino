@@ -37,10 +37,10 @@ class MyServerCallbacks : public BLEServerCallbacks {
 
 class MyCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic *pCharacteristic) {
-    std::string rxValue = pCharacteristic->getValue();
+    String rxValue = pCharacteristic->getValue();
     if (rxValue.length() > 0) {
       Serial.print("Received: ");
-      Serial.println(rxValue.c_str());
+      Serial.println(rxValue);
     }
   }
 };
@@ -49,8 +49,6 @@ void setup() {
   Serial.begin(115200);
   delay(100);
   Serial.println("\n\nWible ESP32 Serial Monitor\n");
-
-  pinMode(LED_BUILTIN, OUTPUT);
 
   // Initialize BLE
   BLEDevice::init("Wible");
@@ -82,6 +80,7 @@ void setup() {
   pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
   pAdvertising->setMinPreferred(0x12);
   BLEDevice::startAdvertising();
+  
   Serial.println("BLE device active, waiting for connections...\n");
 }
 
@@ -94,20 +93,15 @@ void loop() {
       // Save the last time the event occurred
       previousMillis = currentMillis;
 
+      // Prepare the value to send
+      String counterString = "Counter value: " + String(counter) + "\n";
+
       // Write the counter value to remote device
-      pCharacteristic->setValue("Counter value: " + String(counter) + "\n").c_str());
+      pCharacteristic->setValue(counterString.c_str());
       pCharacteristic->notify();
       
       // Increment the counter
       counter++;
     }
-  } else {
-    /*
-      * Blink the builtin LED while the BLE device is waiting for connection
-    */
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(250);
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(250);
   }
 }

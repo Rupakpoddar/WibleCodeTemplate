@@ -1,20 +1,24 @@
 /*
   * Developer: Rupak Poddar
-  * Wible Code Template for Arduino
+  * Wible Code Template for ESP32
   * Steer Freely
 */
 
-#include <ArduinoBLE.h>
+#include <Arduino.h>
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <BLE2902.h>
 
-#ifndef _WIBLE_ENABLED_
-  #error "Please install the modified ArduinoBLE library from: >>> https://github.com/Rupakpoddar/WibleCodeTemplate/raw/master/Arduino/ArduinoBLE.zip <<<"
-#endif
+void _STOP(); // Forward declaration
 
-/*
-  * Create BLE service & characteristic to allow remote device to read, write, and notify
-*/
-BLEService TX_RX_Service("19B10010-E8F2-537E-4F6C-D104768A1214");
-BLECharacteristic TX_RX_Characteristic("19B10011-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWriteWithoutResponse | BLENotify, 20);
+BLEServer *pServer = NULL;
+BLECharacteristic *pCharacteristic = NULL;
+bool deviceConnected = false;
+
+// UUIDs for the BLE Service and Characteristic
+#define SERVICE_UUID           "66443771-D481-49B0-BE32-8CE24AC0F09C"
+#define CHARACTERISTIC_UUID    "66443772-D481-49B0-BE32-8CE24AC0F09C"
 
 /*
   * Set the following variable to false to disable print statements
@@ -22,14 +26,15 @@ BLECharacteristic TX_RX_Characteristic("19B10011-E8F2-537E-4F6C-D104768A1214", B
 bool verbose = true;
 
 /*
-  * Utilize PWM pins for motor drivers
-  * Connect motor driver 1 to Arduino pin 5, 6
-  * Connect motor driver 2 to Arduino pin 10, 11
+  * Connect motor driver 1 to pin 16, 17
+  * Connect motor driver 2 to pin 18, 19
+  * Connect light to pin 21
 */
-#define M1A 5
-#define M1B 6
-#define M2A 10
-#define M2B 11
+#define M1A 16
+#define M1B 17
+#define M2A 18
+#define M2B 19
+#define LED 21
 
 /*
   * Initialize the robot with the following values
@@ -39,73 +44,28 @@ unsigned char speed = 100;
 String command = "STOP";
 bool ignitionState = false;
 
-void setup() {
-  if (verbose) {
-    Serial.begin(9600);
-    delay(100);
-    Serial.println("\n\nWible Arduino Steer Freely\n");
+class MyServerCallbacks : public BLEServerCallbacks {
+  void onConnect(BLEServer* pServer) {
+    deviceConnected = true;
   }
 
-  pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(M1A, OUTPUT);
-  pinMode(M1B, OUTPUT);
-  pinMode(M2A, OUTPUT);
-  pinMode(M2B, OUTPUT);
-
-  _STOP();
-
-  // Initialize BLE module
-  if (!BLE.begin()) {
-    if (verbose) {
-      Serial.println("BLE Initialization failed!");
-    }
-    
-    while (1);
+  void onDisconnect(BLEServer* pServer) {
+    deviceConnected = false;
   }
+};
 
-  // Set the local and device name this peripheral advertises (default: Arduino)
-  BLE.setLocalName("Wible");
-  BLE.setDeviceName("Wible");
-
-  // Set the UUID for the service this peripheral advertises
-  BLE.setAdvertisedService(TX_RX_Service);
-
-  // Add the characteristics to the service
-  TX_RX_Service.addCharacteristic(TX_RX_Characteristic);
-
-  // Add the service
-  BLE.addService(TX_RX_Service);
-
-  // Start advertising
-  BLE.advertise();
-
-  if (verbose) {
-    Serial.println("BLE device active, waiting for connections...\n");
-  }
-}
-
-void loop() {
-  /*
-    * Poll for BLE events
-  */
-  BLE.poll();
-
-  if (BLE.connected()) {
-    if (TX_RX_Characteristic.written()) {
-      // Get the data as a pointer to uint8_t (byte array)
-      const uint8_t* value = TX_RX_Characteristic.value();
-
-      // Convert the byte array to a String
-      String receivedString = String((char*)value);
-
+class MyCallbacks : public BLECharacteristicCallbacks {
+  void onWrite(BLECharacteristic *pCharacteristic) {
+    String rxValue = pCharacteristic->getValue();
+    if (rxValue.length() > 0) {
       if (verbose) {
         Serial.print("----- Received String: ");
-        Serial.print(receivedString);
+        Serial.print(rxValue);
         Serial.print(" -----\n\n");
       }
 
-      speed = receivedString.substring(0, 3).toInt();
-      command = receivedString.substring(3, 7);
+      speed = rxValue.substring(0, 3).toInt();
+      command = rxValue.substring(3, 7);
 
       if (verbose) {
         Serial.print("Speed: ");
@@ -129,11 +89,11 @@ void loop() {
       }
 
       if (command == "LTON") {
-        digitalWrite(LED_BUILTIN, HIGH);
+        digitalWrite(LED, HIGH);
       }
 
       if (command == "LTOF") {
-        digitalWrite(LED_BUILTIN, LOW);
+        digitalWrite(LED, LOW);
       }
 
       /*
@@ -210,17 +170,67 @@ void loop() {
         }
       }
     }
-  } else {
+  }
+};
+
+void setup() {
+  if (verbose) {
+    Serial.begin(115200);
+    delay(100);
+    Serial.println("\n\nWible ESP32 Steer Freely\n");
+  }
+
+  pinMode(LED, OUTPUT);
+  pinMode(M1A, OUTPUT);
+  pinMode(M1B, OUTPUT);
+  pinMode(M2A, OUTPUT);
+  pinMode(M2B, OUTPUT);
+
+  _STOP();
+
+  // Initialize BLE
+  BLEDevice::init("Wible");
+  pServer = BLEDevice::createServer();
+  pServer->setCallbacks(new MyServerCallbacks());
+
+  // Create the BLE Service
+  BLEService *pService = pServer->createService(SERVICE_UUID);
+
+  // Create the BLE Characteristic
+  pCharacteristic = pService->createCharacteristic(
+                      CHARACTERISTIC_UUID,
+                      BLECharacteristic::PROPERTY_READ   |
+                      BLECharacteristic::PROPERTY_WRITE  |
+                      BLECharacteristic::PROPERTY_WRITE_NR |
+                      BLECharacteristic::PROPERTY_NOTIFY
+                    );
+
+  pCharacteristic->addDescriptor(new BLE2902());
+  pCharacteristic->setCallbacks(new MyCallbacks());
+
+  // Start the service
+  pService->start();
+
+  // Start advertising
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+  pAdvertising->addServiceUUID(SERVICE_UUID);
+  pAdvertising->setScanResponse(true);
+  pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
+  pAdvertising->setMinPreferred(0x12);
+  BLEDevice::startAdvertising();
+
+  if (verbose) {
+    Serial.println("BLE device active, waiting for connections...\n");
+  }
+}
+
+void loop() {
+  if (!deviceConnected) {
     /*
       * Waiting for connection
     */
     ignitionState = false;
     _STOP();
-
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(250);
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(250);
   }
 }
 
