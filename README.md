@@ -36,10 +36,11 @@ Explore example codes for the following devices and modules:
 
 ### 📲 **Download Wible**
 
-<div style="display: flex; gap: 200px;">
+<p>
   <a href="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/AppStoreQR.png"><img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/AppStoreQR.png" width="262.5"></a>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <a href="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/PlaystoreQR.png"><img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/PlaystoreQR.png" width="262.5"></a>
-</div>
+</p>
 
 ### 📸 **Screenshots**
 
