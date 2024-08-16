@@ -1,4 +1,4 @@
-# ![Wible Logo](https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/WibleIcon.png) Wible
+# <img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/WibleIcon.png" height="30" align="left"> Wible
 
 ## Unleash the Power of DIY Technology
 
@@ -6,11 +6,9 @@ Welcome to Wible, an innovative app that empowers you to harness the full potent
 
 ### Features
 
-- **Wireless Serial Monitor:** Seamlessly connect to your BLE-enabled microcontrollers, just like using the traditional Arduino Serial Monitor. Wible offers bi-directional communication with minimal coding and no need for hardware modifications.
-  
-- **Omnidirectional Robot Control:** Wible’s multitouch interface allows you to steer and control omnidirectional robots with super low latency, providing a responsive and intuitive control experience.
+- **Wireless Serial Monitor:** Seamlessly connect to your BLE-enabled microcontrollers, just like using the traditional Arduino Serial Monitor. Wible offers bi-directional communication with minimal coding and no need for hardware modifications, all within a modern, reliable interface.
 
-- **Beautiful and Reliable UI:** Enjoy a modern and aesthetically pleasing interface that’s built for reliability, ensuring that your projects run smoothly.
+- **Steer Freely:** Control a variety of DIY robots—including quadruped robots, rovers, omnidirectional robots, robotic cars, and robot dogs—using Wible’s multitouch interface. Enjoy super low latency for a responsive and intuitive control experience.
 
 ### Supported Devices
 
@@ -38,22 +36,24 @@ Explore example codes for the following devices and modules:
 
 ### Download Wible
 
-- [![App Store](https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/AppStoreQR.png)](https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/AppStoreQR.png) App Store (iOS)
-- [![Playstore](https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/PlaystoreQR.png)](https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/PlaystoreQR.png) Playstore (Android)
+<div style="display: flex; gap: 20px;">
+  <a href="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/AppStoreQR.png"><img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/AppStoreQR.png" width="150"></a>
+  <a href="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/PlaystoreQR.png"><img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/PlaystoreQR.png" width="150"></a>
+</div>
 
 ### Screenshots
 
 #### Home Page
-![Home Page](https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/Screenshots/Apple%20iPhone%2011%20Pro%20Max%20Screenshot%201.png)
+<img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/Screenshots/Apple%20iPhone%2011%20Pro%20Max%20Screenshot%201.png" width="250" />
 
 #### Serial Monitor
-<div style="display: flex;">
-  <img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/Screenshots/Apple%20iPhone%2011%20Pro%20Max%20Screenshot%202.png" width="45%" />
-  <img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/Screenshots/Apple%20iPhone%2011%20Pro%20Max%20Screenshot%203.png" width="45%" style="margin-left: 10px;" />
+<div style="display: flex; gap: 10px;">
+  <img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/Screenshots/Apple%20iPhone%2011%20Pro%20Max%20Screenshot%202.png" width="200" />
+  <img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/Screenshots/Apple%20iPhone%2011%20Pro%20Max%20Screenshot%203.png" width="200" />
 </div>
 
 #### Steer Freely
-<div style="display: flex;">
-  <img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/Screenshots/Apple%20iPhone%2011%20Pro%20Max%20Screenshot%204.png" width="45%" />
-  <img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/Screenshots/Apple%20iPhone%2011%20Pro%20Max%20Screenshot%205.png" width="45%" style="margin-left: 10px;" />
+<div style="display: flex; gap: 10px;">
+  <img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/Screenshots/Apple%20iPhone%2011%20Pro%20Max%20Screenshot%204.png" width="200" />
+  <img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/Screenshots/Apple%20iPhone%2011%20Pro%20Max%20Screenshot%205.png" width="200" />
 </div>
