@@ -6,9 +6,9 @@ Welcome to Wible, an innovative app that empowers you to harness the full potent
 
 ### 🚀 **Key Features**
 
-- **<span style="color: #FFA500;">💻 Wireless Serial Monitor</span>:** Seamlessly connect to your BLE-enabled microcontrollers, just like using the traditional Arduino Serial Monitor. Wible offers **bi-directional communication** with **minimal coding** and **no hardware modifications,** all within a **modern, reliable interface.**
+- **💻 WIRELESS SERIAL MONITOR:** Seamlessly connect to your BLE-enabled microcontrollers, just like using the traditional Arduino Serial Monitor. Wible offers **bi-directional communication** with **minimal coding** and **no hardware modifications,** all within a **modern, reliable interface.**
 
-- **<span style="color: #FFA500;">🎮 Steer Freely</span>:** Control a variety of DIY robots—including quadruped robots, rovers, omnidirectional robots, robotic cars, and robot dogs—using Wible’s multitouch interface. Enjoy **super low latency** for a **responsive** and **intuitive** control experience.
+- **🎮 STEER FREELY:** Control a variety of DIY robots—including quadruped robots, rovers, omnidirectional robots, robotic cars, and robot dogs—using Wible’s multitouch interface. Enjoy **super low latency** for a **responsive** and **intuitive** control experience.
 
 ### ✅ **Supported Devices**
 
@@ -36,14 +36,13 @@ Explore example codes for the following devices and modules:
 
 ### 📲 **Download Wible**
 
+- [App Store](https://apps.apple.com/us/app/wible/id6472097054)
+- [Playstore](https://play.google.com/store/apps/details?id=com.rupakpoddar.blebotcontroller)
+
 <p>
   <a href="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/AppStoreQR.png"><img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/AppStoreQR.png" width="262.5"></a>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <a href="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/PlaystoreQR.png"><img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/PlaystoreQR.png" width="262.5"></a>
-</p>
-
-<p align="center">
-  <a href="https://apps.apple.com/us/app/wible/id6472097054">App Store</a> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="https://play.google.com/store/apps/details?id=com.rupakpoddar.blebotcontroller">Playstore</a>
 </p>
 
 ### 📸 **Screenshots**
