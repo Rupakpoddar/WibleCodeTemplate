@@ -36,8 +36,8 @@ Explore example codes for the following devices and modules:
 
 ### 📲 **Download Wible**
 
-- [App Store](https://apps.apple.com/us/app/wible/id6472097054)
-- [Playstore](https://play.google.com/store/apps/details?id=com.rupakpoddar.blebotcontroller)
+- [App Store (iOS)](https://apps.apple.com/us/app/wible/id6472097054)
+- [Google Play (Android)](https://play.google.com/store/apps/details?id=com.rupakpoddar.blebotcontroller)
 
 <p>
   <a href="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/AppStoreQR.png"><img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/AppStoreQR.png" width="262.5"></a>
