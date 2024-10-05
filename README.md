@@ -42,7 +42,7 @@ Explore example codes for the following devices and modules:
 <p>
   <a href="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/AppStoreQR.png"><img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/AppStoreQR.png" width="262.5"></a>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <a href="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/PlaystoreQR.png"><img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/PlaystoreQR.png" width="262.5"></a>
+  <a href="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/PlaystoreQR.png"><img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/PlayStoreQR.png" width="262.5"></a>
 </p>
 
 ### 📸 **Screenshots**
