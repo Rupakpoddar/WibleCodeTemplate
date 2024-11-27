@@ -9,7 +9,7 @@ const char* password = "YOUR_PASS";
 // UDP setup
 WiFiUDP udp;            // UDP server instance
 const int udpPort = 4210; // Port to listen for incoming packets
-char incomingPacket[255]; // Buffer for incoming packets
+uint8_t incomingPacket[2]; // Buffer for incoming packets (2 bytes)
 
 // Option to enable/disable verbose mode
 bool verbose = false; // Change this value to false to disable verbose logging
@@ -49,62 +49,90 @@ void setup() {
 void loop() {
   // Check for incoming data
   int packetSize = udp.parsePacket();
-  if (packetSize) {
-    int len = udp.read(incomingPacket, 255);
-    if (len > 0) {
-      incomingPacket[len] = 0; // Null-terminate the packet
-      String receivedData = String(incomingPacket);
-      receivedData.trim(); // Removes leading and trailing spaces and newlines
+  if (packetSize == 2) { // Expecting exactly 2 bytes
+    udp.read(incomingPacket, 2);
+
+    uint8_t x = static_cast<int8_t>(incomingPacket[0]); // First byte
+    uint8_t y = static_cast<int8_t>(incomingPacket[1]); // Second byte
+
+    // Trackpad
+    if (x <= 100 && y <= 100) {
+      // Handle the offsets
+      x -= 50;
+      y -= 50;
+
+      // Move the mouse based on x and y values
+      Mouse.move(x, y, 0);
 
       if (verbose) {
-        Serial.print("Received: ");
-        Serial.println(receivedData);
+        Serial.print("X = ");
+        Serial.print(x);
+        Serial.print(", Y = ");
+        Serial.println(y);
       }
+    }
+    // Mouse Buttons
+    else if (x > 100 && y < 100) {
+      // Left Button
+      if (x == (128+2)) {
+        // Press
+        if (y == 2) {
+          Mouse.press(MOUSE_LEFT);
+          if (verbose) {
+            Serial.println("MOUSE_LEFT_PRESS");
+          }
+        }
 
-      // Check for TAP command
-      if (receivedData == "TAP") {
-        Mouse.click(MOUSE_LEFT);
-        if (verbose) {
-          Serial.println("Mouse TAP Triggered");
-        }
-      } else {
-        // Handle x:y movement data
-        int x = 0, y = 0;
-        if (parseMovement(receivedData, x, y)) {
-          // Move the mouse based on x and y values
-          Mouse.move(x, y, 0);
+        // Release
+        if (y == 1) {
+          Mouse.release(MOUSE_LEFT);
           if (verbose) {
-            Serial.print("Mouse moved: X = ");
-            Serial.print(x);
-            Serial.print(", Y = ");
-            Serial.println(y);
-          }
-        } else {
-          if (verbose) {
-            Serial.println("Invalid data format.");
+            Serial.println("MOUSE_LEFT_RELEASE");
           }
         }
+
+        // Click
+        if (y == 4) {
+          Mouse.click(MOUSE_LEFT);
+          if (verbose) {
+            Serial.println("MOUSE_LEFT_CLICK");
+          }
+        }
+      }
+      // Right Button
+      else if (x == (128+1)) {
+        // Press
+        if (y == 2) {
+          Mouse.press(MOUSE_RIGHT);
+          if (verbose) {
+            Serial.println("MOUSE_RIGHT_PRESS");
+          }
+        }
+
+        // Release
+        if (y == 1) {
+          Mouse.release(MOUSE_RIGHT);
+          if (verbose) {
+            Serial.println("MOUSE_RIGHT_RELEASE");
+          }
+        }
+
+        // Click
+        if (y == 4) {
+          Mouse.click(MOUSE_RIGHT);
+          if (verbose) {
+            Serial.println("MOUSE_RIGHT_CLICK");
+          }
+        }
+      }
+      // Scroll
+      else if (x == (128+4)) {
+        // Handle offset
+        y -= 50;
+
+        // Scroll based on y values
+        Mouse.move(0, 0, y);
       }
     }
   }
-}
-
-// Function to parse movement data (x:y) from the string
-bool parseMovement(String data, int &x, int &y) {
-  int colonIndex = data.indexOf(':');
-
-  // Validate the format (must contain a colon)
-  if (colonIndex == -1) {
-    return false;
-  }
-
-  // Extract x and y values
-  String xStr = data.substring(0, colonIndex);
-  String yStr = data.substring(colonIndex + 1);
-
-  // Convert to integers
-  x = xStr.toInt();
-  y = yStr.toInt();
-
-  return true; // Parsing successful
 }
