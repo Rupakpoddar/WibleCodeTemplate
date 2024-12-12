@@ -45,7 +45,7 @@ while True:
             previousMillis = currentMillis
 
             # Create a message string
-            msg = "Counter value:" + str(counter) + "\n"
+            msg = "Counter value: " + str(counter) + "\n"
 
             # Send the message via BLE
             sp.send(msg)
