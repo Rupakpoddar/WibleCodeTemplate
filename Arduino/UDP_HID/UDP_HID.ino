@@ -1,12 +1,13 @@
 #include "Mouse.h"
 #include <WiFiS3.h>
 #include <WiFiUdp.h>
+#include "switchTable.h"
 #include "ArduinoGraphics.h"
 #include "Arduino_LED_Matrix.h"
 
 // Wi-Fi Credentials
-const char* ssid = "YOUR SSID";
-const char* password = "YOUR PASSWORD";
+const char* ssid = "YOUR_SSID";
+const char* password = "YOUR_PASSWORD";
 
 // UDP setup
 WiFiUDP udp;                // UDP server instance
@@ -17,6 +18,21 @@ uint8_t incomingPacket[2];  // Buffer for incoming packets (2 bytes)
 bool verbose = false; // Change this value to false to disable verbose logging
 
 ArduinoLEDMatrix matrix;
+
+// Function to send a media key press
+void sendMediaKey(uint16_t keyCode) {
+  uint8_t report[3] = {0x02, static_cast<uint8_t>(keyCode), static_cast<uint8_t>(keyCode >> 8)};
+  
+  // Send the report
+  HID().SendReport(2, report, sizeof(report));
+  
+  delay(50);
+  
+  // Release the key
+  report[1] = 0x00;
+  report[2] = 0x00;
+  HID().SendReport(2, report, sizeof(report));
+}
 
 void setup() {
   if (verbose) {
@@ -88,6 +104,7 @@ void loop() {
         Serial.println(y);
       }
     }
+
     // Mouse Buttons
     else if (x > 100 && y < 100) {
       // Left Button
@@ -101,7 +118,7 @@ void loop() {
         }
 
         // Release
-        if (y == 1) {
+        else if (y == 1) {
           Mouse.release(MOUSE_LEFT);
           if (verbose) {
             Serial.println("MOUSE_LEFT_RELEASE");
@@ -109,7 +126,7 @@ void loop() {
         }
 
         // Click
-        if (y == 4) {
+        else if (y == 4) {
           Mouse.click(MOUSE_LEFT);
           if (verbose) {
             Serial.println("MOUSE_LEFT_CLICK");
@@ -127,7 +144,7 @@ void loop() {
         }
 
         // Release
-        if (y == 1) {
+        else if (y == 1) {
           Mouse.release(MOUSE_RIGHT);
           if (verbose) {
             Serial.println("MOUSE_RIGHT_RELEASE");
@@ -135,13 +152,14 @@ void loop() {
         }
 
         // Click
-        if (y == 4) {
+        else if (y == 4) {
           Mouse.click(MOUSE_RIGHT);
           if (verbose) {
             Serial.println("MOUSE_RIGHT_CLICK");
           }
         }
       }
+
       // Scroll
       else if (x == (128+4)) {
         // Handle offset
@@ -149,6 +167,32 @@ void loop() {
 
         // Scroll based on y values
         Mouse.move(0, 0, y);
+      }
+    }
+
+    // Keyboard
+    else if (y > 100) {
+      // Press
+      if (y == (128+2)) {
+        if (x != 0) {
+          if (x > 74) {
+            sendMediaKey(switchTable[x]);
+          } else {
+            Keyboard.press(switchTable[x]);
+          }
+        }
+      }
+
+      // Release
+      else if (y == (128+1)) {
+        if (x != 0) {
+          Keyboard.release(switchTable[x]);
+        }
+      }
+
+      // Release All
+      else if (y == (128+4)) {
+        Keyboard.releaseAll();
       }
     }
   }
