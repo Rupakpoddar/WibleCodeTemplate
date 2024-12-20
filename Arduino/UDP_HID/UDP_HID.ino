@@ -48,9 +48,17 @@ void setup() {
     }
   }
   if (verbose) {
-    Serial.println("\n\nWiFi connected.");
+    Serial.println("\nWiFi connected.");
     Serial.print("Arduino IP address: ");
     Serial.println(WiFi.localIP());
+  }
+
+  // Start UDP server
+  udp.begin(udpPort);
+  if (verbose) {
+    Serial.print("Listening on UDP port: ");
+    Serial.println(udpPort);
+    Serial.println();
   }
 
   // Display the IP address on LED Matrix
@@ -65,14 +73,6 @@ void setup() {
   matrix.endText(SCROLL_LEFT);
   matrix.endDraw();
 
-  // Start UDP server
-  udp.begin(udpPort);
-  if (verbose) {
-    Serial.print("Listening on UDP port: ");
-    Serial.println(udpPort);
-    Serial.println();
-  }
-
   // Start Mouse Control
   Mouse.begin();
 
@@ -86,8 +86,8 @@ void loop() {
   if (packetSize == 2) { // Expecting exactly 2 bytes
     udp.read(incomingPacket, 2);
 
-    uint8_t x = static_cast<int8_t>(incomingPacket[0]); // First byte
-    uint8_t y = static_cast<int8_t>(incomingPacket[1]); // Second byte
+    int16_t x = incomingPacket[0]; // First byte
+    int16_t y = incomingPacket[1]; // Second byte
 
     // Trackpad
     if (x <= 100 && y <= 100) {
