@@ -1,38 +1,36 @@
+/*
+  NOTICE: Update WiFi Credentials
+
+  Before uploading this sketch, open "secrets.h" 
+  and update the WiFi SSID and password with your network details.
+
+  After a successful connection, the board's IP address will be 
+  displayed on the built-in LED matrix. The default UDP port is 4210.
+
+  To reprogram the board:
+  1. Double-press the reset button until the built-in LED starts fading in and out.
+  2. Reselect the port in the Arduino IDE.
+  3. Upload the new code.
+*/
+
 #include "Mouse.h"
 #include <WiFiS3.h>
 #include <WiFiUdp.h>
+#include "secrets.h"
 #include "switchTable.h"
 #include "ArduinoGraphics.h"
 #include "Arduino_LED_Matrix.h"
 
-// Wi-Fi Credentials
-const char* ssid = "YOUR_SSID";
-const char* password = "YOUR_PASSWORD";
-
-// UDP setup
+// UDP Setup
 WiFiUDP udp;                // UDP server instance
 const int udpPort = 4210;   // Port to listen for incoming packets
 uint8_t incomingPacket[2];  // Buffer for incoming packets (2 bytes)
 
 // Option to enable/disable verbose mode
-bool verbose = false; // Change this value to false to disable verbose logging
+bool verbose = false;
 
+// Built-in LED matrix to display the IP address
 ArduinoLEDMatrix matrix;
-
-// Function to send a media key press
-void sendMediaKey(uint16_t keyCode) {
-  uint8_t report[3] = {0x02, static_cast<uint8_t>(keyCode), static_cast<uint8_t>(keyCode >> 8)};
-  
-  // Send the report
-  HID().SendReport(2, report, sizeof(report));
-  
-  delay(50);
-  
-  // Release the key
-  report[1] = 0x00;
-  report[2] = 0x00;
-  HID().SendReport(2, report, sizeof(report));
-}
 
 void setup() {
   if (verbose) {
@@ -41,23 +39,22 @@ void setup() {
     while (!Serial);
   }
 
-  matrix.begin();
-
   // Connect to Wi-Fi
-  WiFi.begin(ssid, password);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
     if (verbose) {
+      delay(500);
       Serial.print(".");
     }
   }
   if (verbose) {
-    Serial.println("\nWiFi connected.");
+    Serial.println("\n\nWiFi connected.");
     Serial.print("Arduino IP address: ");
     Serial.println(WiFi.localIP());
   }
 
   // Display the IP address on LED Matrix
+  matrix.begin();
   matrix.beginDraw();
   matrix.stroke(0xFFFFFFFF);
   matrix.textScrollSpeed(50);
@@ -71,12 +68,16 @@ void setup() {
   // Start UDP server
   udp.begin(udpPort);
   if (verbose) {
-    Serial.print("Listening on UDP port ");
+    Serial.print("Listening on UDP port: ");
     Serial.println(udpPort);
+    Serial.println();
   }
 
-  // Start Mouse control
+  // Start Mouse Control
   Mouse.begin();
+
+  // Start Keyboard Control
+  Keyboard.begin();
 }
 
 void loop() {
@@ -116,7 +117,6 @@ void loop() {
             Serial.println("MOUSE_LEFT_PRESS");
           }
         }
-
         // Release
         else if (y == 1) {
           Mouse.release(MOUSE_LEFT);
@@ -124,7 +124,6 @@ void loop() {
             Serial.println("MOUSE_LEFT_RELEASE");
           }
         }
-
         // Click
         else if (y == 4) {
           Mouse.click(MOUSE_LEFT);
@@ -133,6 +132,7 @@ void loop() {
           }
         }
       }
+
       // Right Button
       else if (x == (128+1)) {
         // Press
@@ -142,7 +142,6 @@ void loop() {
             Serial.println("MOUSE_RIGHT_PRESS");
           }
         }
-
         // Release
         else if (y == 1) {
           Mouse.release(MOUSE_RIGHT);
@@ -150,7 +149,6 @@ void loop() {
             Serial.println("MOUSE_RIGHT_RELEASE");
           }
         }
-
         // Click
         else if (y == 4) {
           Mouse.click(MOUSE_RIGHT);
@@ -167,32 +165,41 @@ void loop() {
 
         // Scroll based on y values
         Mouse.move(0, 0, y);
+        if (verbose) {
+          Serial.print("SCROLL = ");
+          Serial.println(y);
+        }
       }
     }
 
     // Keyboard
     else if (y > 100) {
-      // Press
+      // Key Press
       if (y == (128+2)) {
         if (x != 0) {
-          if (x > 74) {
-            sendMediaKey(switchTable[x]);
-          } else {
-            Keyboard.press(switchTable[x]);
+          Keyboard.press(switchTable[x]);
+          if (verbose) {
+            Serial.print("PRESS SWITCH ID = ");
+            Serial.println(x);
           }
         }
       }
-
       // Release
       else if (y == (128+1)) {
         if (x != 0) {
           Keyboard.release(switchTable[x]);
+          if (verbose) {
+            Serial.print("RELEASE SWITCH ID = ");
+            Serial.println(x);
+          }
         }
       }
-
       // Release All
       else if (y == (128+4)) {
         Keyboard.releaseAll();
+        if (verbose) {
+          Serial.println("KEYBOARD_RELEASE_ALL");
+        }
       }
     }
   }

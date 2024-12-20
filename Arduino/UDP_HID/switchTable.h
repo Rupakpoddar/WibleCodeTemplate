@@ -76,10 +76,12 @@ const uint8_t switchTable[81] = {
   KEY_LEFT_ARROW,      // ARROW_LEFT
   KEY_DOWN_ARROW,      // ARROW_DOWN
   KEY_RIGHT_ARROW,     // ARROW_RIGHT
-  0xB6,                // MEDIA_PREVIOUS
-  0xCD,                // MEDIA_PLAY_PAUSE
-  0xB5,                // MEDIA_NEXT
-  0xE2,                // MEDIA_VOLUME_MUTE
-  0xEA,                // MEDIA_VOLUME_DOWN
-  0xE9                 // MEDIA_VOLUME_UP
+
+  // MEDIA KEYS ARE NOT SUPPORTED ON THIS PLATFORM
+  0x00,                // MEDIA_PREVIOUS
+  0x00,                // MEDIA_PLAY_PAUSE
+  0x00,                // MEDIA_NEXT
+  0x00,                // MEDIA_VOLUME_MUTE
+  0x00,                // MEDIA_VOLUME_DOWN
+  0x00                 // MEDIA_VOLUME_UP
 };
