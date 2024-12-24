@@ -1,4 +1,3 @@
-#include <ConsumerKeyboard.h>
 #include <Keyboard.h>
 
 const uint8_t switchTable[81] = {

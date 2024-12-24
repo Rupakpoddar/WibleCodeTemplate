@@ -14,12 +14,10 @@
 */
 
 #include "Mouse.h"
-#include <WiFiS3.h>
+#include <WiFi.h>
 #include <WiFiUdp.h>
 #include "secrets.h"
 #include "switchTable.h"
-#include "ArduinoGraphics.h"
-#include "Arduino_LED_Matrix.h"
 
 // UDP Setup
 WiFiUDP udp;                // UDP server instance
@@ -27,10 +25,8 @@ const int udpPort = 4210;   // Port to listen for incoming packets
 uint8_t incomingPacket[2];  // Buffer for incoming packets (2 bytes)
 
 // Option to enable/disable verbose mode
-bool verbose = false;
+bool verbose = true;
 
-// Built-in LED matrix to display the IP address
-ArduinoLEDMatrix matrix;
 
 void setup() {
   if (verbose) {
@@ -60,18 +56,6 @@ void setup() {
     Serial.println(udpPort);
     Serial.println();
   }
-
-  // Display the IP address on LED Matrix
-  matrix.begin();
-  matrix.beginDraw();
-  matrix.stroke(0xFFFFFFFF);
-  matrix.textScrollSpeed(50);
-  String paddedLocalIP = "    " + WiFi.localIP().toString() + "    ";
-  matrix.textFont(Font_5x7);
-  matrix.beginText(0, 1, 0xFFFFFF);
-  matrix.println(paddedLocalIP);
-  matrix.endText(SCROLL_LEFT);
-  matrix.endDraw();
 
   // Start Mouse Control
   Mouse.begin();
@@ -178,7 +162,7 @@ void loop() {
       if (y == (128+2)) {
         if (x != 0) {
           if (x > 74) {
-            ConsumerKeyboard.press(switchTable[x]);
+            Keyboard.consumerPress(switchTable[x]);
           } else {
             Keyboard.press(switchTable[x]);
           }
@@ -192,7 +176,7 @@ void loop() {
       else if (y == (128+1)) {
         if (x != 0) {
           if (x > 74) {
-            ConsumerKeyboard.release();
+            Keyboard.consumerRelease();
           } else {
             Keyboard.release(switchTable[x]);
           }
@@ -205,7 +189,7 @@ void loop() {
       // Release All
       else if (y == (128+4)) {
         Keyboard.releaseAll();
-        ConsumerKeyboard.release();
+        Keyboard.consumerRelease();
         if (verbose) {
           Serial.println("KEYBOARD_RELEASE_ALL");
         }
