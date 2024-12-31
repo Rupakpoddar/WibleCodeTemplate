@@ -39,7 +39,6 @@ void setup() {
   if (verbose) {
     // Start Serial communication
     Serial.begin(115200);
-    while (!Serial);
   }
 
   // Connect to Wi-Fi
