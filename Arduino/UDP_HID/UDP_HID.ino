@@ -17,20 +17,23 @@
 #include <WiFiS3.h>
 #include <WiFiUdp.h>
 #include "secrets.h"
-#include "switchTable.h"
 #include "ArduinoGraphics.h"
+#include "keyboard_helper.hpp"
 #include "Arduino_LED_Matrix.h"
+
+// Option to enable/disable verbose mode
+bool verbose = false;
 
 // UDP Setup
 WiFiUDP udp;                // UDP server instance
 const int udpPort = 4210;   // Port to listen for incoming packets
 uint8_t incomingPacket[2];  // Buffer for incoming packets (2 bytes)
 
-// Option to enable/disable verbose mode
-bool verbose = false;
-
 // Built-in LED matrix to display the IP address
 ArduinoLEDMatrix matrix;
+
+// ConsumerKeyboard class instance for media control 
+ConsumerKeyboard mediaControl;
 
 void setup() {
   if (verbose) {
@@ -177,7 +180,11 @@ void loop() {
       // Key Press
       if (y == (128+2)) {
         if (x != 0) {
-          Keyboard.press(switchTable[x]);
+          if (x < 75) {
+            Keyboard.press(switchTable[x]);
+          } else {
+            mediaControl.press(consumerTable[x % 75]);
+          }
           if (verbose) {
             Serial.print("PRESS SWITCH ID = ");
             Serial.println(x);
@@ -187,7 +194,11 @@ void loop() {
       // Release
       else if (y == (128+1)) {
         if (x != 0) {
-          Keyboard.release(switchTable[x]);
+          if (x < 75) {
+            Keyboard.release(switchTable[x]);
+          } else {
+            mediaControl.release();
+          }
           if (verbose) {
             Serial.print("RELEASE SWITCH ID = ");
             Serial.println(x);
@@ -197,6 +208,7 @@ void loop() {
       // Release All
       else if (y == (128+4)) {
         Keyboard.releaseAll();
+        mediaControl.release();
         if (verbose) {
           Serial.println("KEYBOARD_RELEASE_ALL");
         }
