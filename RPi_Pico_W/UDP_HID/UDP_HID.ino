@@ -42,9 +42,13 @@ void setup() {
   if (verbose) {
     // Start Serial communication
     Serial.begin(115200);
+    delay(1000);
   }
 
   // Connect to Wi-Fi
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
+  delay(1000);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     if (verbose) {
