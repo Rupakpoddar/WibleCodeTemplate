@@ -2,13 +2,15 @@
 
 ## Unleash the Power of DIY Technology.
 
-Welcome to Wible, an innovative app that empowers you to harness the full potential of BLE (Bluetooth Low Energy) on your Android and iOS devices. With Wible, you can connect to popular BLE-based microcontrollers and modules, transforming your smartphone into a powerful wireless serial monitor interface and a versatile control unit for your DIY projects.
+Welcome to Wible, an innovative app that empowers you to harness the full potential of BLE (Bluetooth Low Energy) and WiFi on your Android and iOS devices. With Wible, you can connect to popular BLE-based microcontrollers and modules, as well as control devices over WiFi, transforming your smartphone into a powerful wireless serial monitor, versatile control unit, and now, a wireless HID interface for your DIY projects and more.
 
 ### 🚀 **Key Features**
 
-- **💻 WIRELESS SERIAL MONITOR:** Seamlessly connect to your BLE-enabled microcontrollers, just like using the traditional Arduino Serial Monitor. Wible offers **bi-directional communication** with **minimal coding** and **no hardware modifications,** all within a **modern, reliable interface.**
+- **WIRELESS SERIAL MONITOR:** Seamlessly connect to your BLE-enabled microcontrollers, just like using the traditional Arduino Serial Monitor. Wible offers **bi-directional communication** with **minimal coding** and **no hardware modifications,** all within a **modern, reliable interface.**
 
-- **🎮 STEER FREELY:** Control a variety of DIY robots—including quadruped robots, rovers, omnidirectional robots, robotic cars, and robot dogs—using Wible’s multitouch interface. Enjoy **super low latency** for a **responsive** and **intuitive** control experience.
+- **WIRELESS HID:** Transform your smartphone into a **full-fledged keyboard, touchpad, and air gesture mouse** using Wible's Wireless HID feature. Operating over WiFi with the UDP protocol, this feature enables you to control any device that supports USB keyboard and mouse inputs, unlocking a new dimension of interactivity and control.
+
+- **STEER FREELY:** Control a variety of DIY robots—including quadruped robots, rovers, omnidirectional robots, robotic cars, and robot dogs—using Wible’s multitouch interface. Enjoy **super low latency** for a **responsive** and **intuitive** control experience.
 
 ### ✅ **Supported Devices**
 
