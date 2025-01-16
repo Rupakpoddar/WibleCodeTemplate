@@ -8,6 +8,11 @@ Welcome to Wible, an innovative app that empowers you to harness the full potent
 
 - **WIRELESS SERIAL MONITOR:** Seamlessly connect to your BLE-enabled microcontrollers, just like using the traditional Arduino Serial Monitor. Wible offers **bi-directional communication** with **minimal coding** and **no hardware modifications,** all within a **modern, reliable interface.**
 
+  Watch the full tutorial on how to use Wible's Wireless Serial Monitor:  
+  <a href="https://youtu.be/TXFQPdkELPQ">
+    <img src="https://img.youtube.com/vi/TXFQPdkELPQ/0.jpg" alt="Watch the video" width="250">
+  </a>
+
 - **WIRELESS HID:** Transform your smartphone into a **full-fledged keyboard, touchpad, and air gesture mouse** using Wible's Wireless HID feature. Operating over WiFi with the UDP protocol, this feature enables you to control any device that supports USB keyboard and mouse inputs, unlocking a new dimension of interactivity and control.
 
 - **STEER FREELY:** Control a variety of DIY robots—including quadruped robots, rovers, omnidirectional robots, robotic cars, and robot dogs—using Wible’s multitouch interface. Enjoy **super low latency** for a **responsive** and **intuitive** control experience.
