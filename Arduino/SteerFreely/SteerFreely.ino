@@ -7,37 +7,30 @@
 #include <ArduinoBLE.h>
 
 #ifndef _WIBLE_ENABLED_
-  #error "Please install the modified ArduinoBLE library from: >>> https://github.com/Rupakpoddar/WibleCodeTemplate/raw/master/Arduino/ArduinoBLE.zip <<<"
+  #error "Please install the modified ArduinoBLE library from: https://github.com/Rupakpoddar/WibleCodeTemplate/raw/master/Arduino/ArduinoBLE.zip"
 #endif
 
-/*
-  * Create BLE service & characteristic to allow remote device to read, write, and notify
-*/
+// Create BLE service & characteristic to allow remote device to read, write, and notify
 BLEService TX_RX_Service("19B10010-E8F2-537E-4F6C-D104768A1214");
 BLECharacteristic TX_RX_Characteristic("19B10011-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWriteWithoutResponse | BLENotify, 20);
 
-/*
-  * Set the following variable to false to disable print statements
-*/
+// Set verbose flag to enable print statements.
 bool verbose = true;
 
-/*
-  * Utilize PWM pins for motor drivers
-  * Connect motor driver 1 to Arduino pin 5, 6
-  * Connect motor driver 2 to Arduino pin 10, 11
-*/
+// Motor driver pins
 #define M1A 5
 #define M1B 6
 #define M2A 10
 #define M2B 11
 
-/*
-  * Initialize the robot with the following values
-*/
+// Robot control variables
 String receivedString = "";
 unsigned char speed = 100;
 String command = "STOP";
 bool ignitionState = false;
+
+// New flag to track BLE connection status changes.
+bool deviceConnected = false;
 
 void setup() {
   if (verbose) {
@@ -57,53 +50,56 @@ void setup() {
   // Initialize BLE module
   if (!BLE.begin()) {
     if (verbose) {
-      Serial.println("BLE Initialization failed!");
+      Serial.println("BLE initialization failed!");
     }
-    
     while (1);
   }
 
-  // Set the local and device name this peripheral advertises (default: Arduino)
+  // Configure BLE parameters
   BLE.setLocalName("Wible");
   BLE.setDeviceName("Wible");
-
-  // Set the UUID for the service this peripheral advertises
   BLE.setAdvertisedService(TX_RX_Service);
 
-  // Add the characteristics to the service
+  // Add the characteristic to the service and add the service
   TX_RX_Service.addCharacteristic(TX_RX_Characteristic);
-
-  // Add the service
   BLE.addService(TX_RX_Service);
 
-  // Start advertising
+  // Start advertising BLE service
   BLE.advertise();
 
   if (verbose) {
-    Serial.println("BLE device active, waiting for connections...\n");
+    Serial.println("Device initialized. Advertising...");
   }
 }
 
 void loop() {
-  /*
-    * Poll for BLE events
-  */
+  // Poll for BLE events
   BLE.poll();
+  
+  // Get the central device, if any central is connected this will be non-null.
+  BLEDevice central = BLE.central();
 
-  if (BLE.connected()) {
+  if (central) {
+    // A central is connected now.
+    if (!deviceConnected) {
+      if (verbose) {
+        Serial.println("Device connected.");
+      }
+      deviceConnected = true;
+    }
+
+    // Check if central has written new data to the TX_RX characteristic
     if (TX_RX_Characteristic.written()) {
-      // Get the data as a pointer to uint8_t (byte array)
       const uint8_t* value = TX_RX_Characteristic.value();
-
-      // Convert the byte array to a String
       String receivedString = String((char*)value);
 
       if (verbose) {
-        Serial.print("----- Received String: ");
+        Serial.print("\n----- Received String: ");
         Serial.print(receivedString);
-        Serial.print(" -----\n\n");
+        Serial.println(" -----\n");
       }
 
+      // Split string values: first 3 characters denote speed, next 4 denote command.
       speed = receivedString.substring(0, 3).toInt();
       command = receivedString.substring(3, 7);
 
@@ -111,27 +107,24 @@ void loop() {
         Serial.print("Speed: ");
         Serial.println(speed);
         Serial.print("Command: ");
-        Serial.print(command);
-        Serial.print("\n\n");
+        Serial.println(command);
       }
 
+      // Process ignition commands
       if (command == "IGON") {
         ignitionState = true;
-      }
-
-      if (command == "IGOF") {
+      } else if (command == "IGOF") {
         ignitionState = false;
         _STOP();
       }
 
+      // Process STOP and LED commands
       if (command == "STOP") {
         _STOP();
       }
-
       if (command == "LTON") {
         digitalWrite(LED_BUILTIN, HIGH);
       }
-
       if (command == "LTOF") {
         digitalWrite(LED_BUILTIN, LOW);
       }
@@ -151,40 +144,30 @@ void loop() {
       */
       // ignitionState = true;
 
+      // Process motor commands if ignition is enabled
       if (ignitionState) {
-        /*
-          * FORWARD
-        */
+        // FORWARD
         if (command == "FWRD") {
           analogWrite(M1A, speed);
           analogWrite(M1B, 0);
           analogWrite(M2A, speed);
           analogWrite(M2B, 0);
         }
-
-        /*
-          * BACKWARD
-        */
+        // BACKWARD
         if (command == "BKWD") {
           analogWrite(M1A, 0);
           analogWrite(M1B, speed);
           analogWrite(M2A, 0);
           analogWrite(M2B, speed);
         }
-
-        /*
-          * LEFT
-        */
+        // LEFT
         if (command == "LEFT") {
           analogWrite(M1A, 0);
           analogWrite(M1B, speed);
           analogWrite(M2A, speed);
           analogWrite(M2B, 0);
         }
-
-        /*
-          * RIGHT
-        */
+        // RIGHT
         if (command == "RGHT") {
           analogWrite(M1A, speed);
           analogWrite(M1B, 0);
@@ -206,20 +189,25 @@ void loop() {
           Serial.println("|   IGNITION STATE OFF   |");
           Serial.println("|                        |");
           Serial.println("+------------------------+");
-          Serial.println("\n\n");
         }
       }
     }
   } else {
-    /*
-      * Waiting for connection
-    */
-    ignitionState = false;
-    _STOP();
-
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(250);
+    // No central is connected. If we were previously connected, clear ignition state, stop motors and restart advertising.
+    if (deviceConnected) {
+      if (verbose) {
+        Serial.println("Device disconnected. Re-advertising...");
+      }
+      deviceConnected = false;
+      ignitionState = false;
+      _STOP();
+      BLE.advertise();
+    }
+    
+    // Blink LED to indicate waiting for connection.
     digitalWrite(LED_BUILTIN, HIGH);
+    delay(250);
+    digitalWrite(LED_BUILTIN, LOW);
     delay(250);
   }
 }
