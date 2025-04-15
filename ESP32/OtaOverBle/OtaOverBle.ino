@@ -11,6 +11,10 @@
 #include <BLE2902.h>
 #include <Update.h>
 
+#ifdef _BLE_DEVICE_H_
+  #error "Conflicting BLE library detected (possibly ArduinoBLE). Please remove it to proceed."
+#endif
+
 BLEServer *pServer = NULL;
 BLECharacteristic *pCharacteristic = NULL;
 bool deviceConnected = false;
