@@ -51,6 +51,9 @@ void setup() {
 }
 
 void loop() {
+  // Poll for BLE events
+  BLE.poll();
+  
   // Get the central device object, if any central is connected it will be non-null
   BLEDevice central = BLE.central();
 
