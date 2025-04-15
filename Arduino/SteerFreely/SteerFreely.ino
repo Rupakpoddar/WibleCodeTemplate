@@ -12,7 +12,8 @@
 
 // Create BLE service & characteristic to allow remote device to read, write, and notify
 BLEService TX_RX_Service("19B10010-E8F2-537E-4F6C-D104768A1214");
-BLECharacteristic TX_RX_Characteristic("19B10011-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWriteWithoutResponse | BLENotify, 20);
+BLECharacteristic TX_RX_Characteristic("19B10011-E8F2-537E-4F6C-D104768A1214", 
+                                        BLERead | BLEWriteWithoutResponse | BLENotify, 20);
 
 // Set verbose flag to enable print statements.
 bool verbose = true;
