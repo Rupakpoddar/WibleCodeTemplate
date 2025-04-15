@@ -28,10 +28,14 @@ const long interval = 1000; // Interval for the delay in milliseconds
 class MyServerCallbacks : public BLEServerCallbacks {
   void onConnect(BLEServer* pServer) {
     deviceConnected = true;
+    Serial.println("Device connected.");
   }
 
   void onDisconnect(BLEServer* pServer) {
     deviceConnected = false;
+    // Restart advertising after disconnecting
+    pServer->getAdvertising()->start();
+    Serial.println("Device disconnected. Re-advertising...");
   }
 };
 
@@ -77,11 +81,11 @@ void setup() {
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
   pAdvertising->addServiceUUID(SERVICE_UUID);
   pAdvertising->setScanResponse(true);
-  pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
+  pAdvertising->setMinPreferred(0x06);
   pAdvertising->setMinPreferred(0x12);
   BLEDevice::startAdvertising();
   
-  Serial.println("BLE device active, waiting for connections...\n");
+  Serial.println("Device initialized. Advertising...");
 }
 
 void loop() {
