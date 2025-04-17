@@ -51,20 +51,3 @@ Explore example codes for the following devices and modules:
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <a href="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/PlayStoreQR.png"><img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/PlayStoreQR.png" width="262.5"></a>
 </p>
-
-### 📸 **Screenshots**
-
-<div style="display: flex; flex-wrap: wrap; gap: 10px;">
-  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-    <img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/Screenshots/Apple%20iPhone%2011%20Pro%20Max%20Screenshot%200.png" width="150" />
-    <img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/Screenshots/Apple%20iPhone%2011%20Pro%20Max%20Screenshot%201.png" width="150" />
-  </div>
-  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-    <img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/Screenshots/Apple%20iPhone%2011%20Pro%20Max%20Screenshot%202.png" width="150" />
-    <img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/Screenshots/Apple%20iPhone%2011%20Pro%20Max%20Screenshot%203.png" width="150" />
-  </div>
-  <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-    <img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/Screenshots/Apple%20iPhone%2011%20Pro%20Max%20Screenshot%204.png" width="150" />
-    <img src="https://github.com/Rupakpoddar/WibleCodeTemplate/blob/master/Assets/Screenshots/Apple%20iPhone%2011%20Pro%20Max%20Screenshot%205.png" width="150" />
-  </div>
-</div>
