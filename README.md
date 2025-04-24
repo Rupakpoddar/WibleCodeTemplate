@@ -2,7 +2,7 @@
 
 ## Unleash the Power of DIY Technology.
 
-Welcome to Wible, an innovative app that empowers you to harness the full potential of BLE (Bluetooth Low Energy) and WiFi on your Android and iOS devices. With Wible, you can connect to popular BLE-based microcontrollers and modules, as well as control devices over WiFi, transforming your smartphone into a powerful wireless serial monitor, versatile control unit, and now, a wireless HID interface for your DIY projects and more.
+Welcome to Wible — an innovative app that empowers you to harness the full potential of BLE (Bluetooth Low Energy) and WiFi on your Android and iOS devices. With Wible, you can connect to popular BLE-based microcontrollers and modules, control devices over WiFi, and even perform blazing-fast OTA firmware updates over BLE. Transform your smartphone into a powerful wireless serial monitor, a versatile control unit, a wireless HID interface, and now, a mobile firmware flashing tool for your DIY hardware projects.
 
 ### 🚀 **Key Features**
 
@@ -12,6 +12,8 @@ Welcome to Wible, an innovative app that empowers you to harness the full potent
   <a href="https://youtu.be/TXFQPdkELPQ">
     <img src="https://img.youtube.com/vi/TXFQPdkELPQ/0.jpg" alt="Watch the video" width="250">
   </a>
+
+- **OTA UPDATE OVER BLE:** Perform **Over-The-Air firmware updates** on supported microcontrollers directly from your smartphone using a `.bin` file. Just export the binary, place it on your phone, and flash it wirelessly. This feature offers **rock-solid reliability** and **blazing-fast transfer speeds**, making firmware updates effortless and efficient.
 
 - **WIRELESS HID:** Transform your smartphone into a **full-fledged keyboard, touchpad, and air gesture mouse** using Wible's Wireless HID feature. Operating over WiFi with the UDP protocol, this feature enables you to control any device that supports USB keyboard and mouse inputs, unlocking a new dimension of interactivity and control.
 
