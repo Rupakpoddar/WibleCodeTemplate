@@ -1,7 +1,21 @@
 /*
-  * Developer: Rupak Poddar
-  * Wible Code Template for ESP32
-  * OTA Update Over BLE
+  This base sketch enables OTA firmware updates via BLE on the ESP32.
+  Flash this code first before attempting any over-the-air updates.
+
+  To update the firmware:
+  1. Make your code changes in this template or integrate it into your project.
+  2. In Arduino IDE, go to Sketch --> Export Compiled Binary.
+  3. A 'build' folder will be created in your project directory.
+  4. Open the subfolder named after your selected MCU.
+  5. Locate the file with the '.ino.bin' extension and move it to your phone.
+
+  Updating via Wible App:
+  1. Open the Wible app and choose OTA Update.
+  2. Connect to your ESP32 device via BLE.
+  3. Select the '.ino.bin' file you placed on your phone.
+  4. Start the update process.
+
+  Once the transfer is complete, the ESP32 will automatically reboot into the new firmware.
 */
 
 #include <Arduino.h>
