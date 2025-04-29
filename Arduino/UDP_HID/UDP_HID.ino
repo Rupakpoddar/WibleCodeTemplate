@@ -52,10 +52,18 @@ void setup() {
       Serial.print(".");
     }
   }
+
+  // Wait for a valid IP via DHCP
+  IPAddress ip;
+  do {
+    ip = WiFi.localIP();
+    delay(100);
+  } while (ip == IPAddress(0, 0, 0, 0));
+
   if (verbose) {
     Serial.println("\nWiFi connected.");
     Serial.print("Arduino IP address: ");
-    Serial.println(WiFi.localIP());
+    Serial.println(ip);
   }
 
   // Start UDP server
@@ -71,7 +79,7 @@ void setup() {
   matrix.beginDraw();
   matrix.stroke(0xFFFFFFFF);
   matrix.textScrollSpeed(50);
-  String paddedLocalIP = "    " + WiFi.localIP().toString() + "    ";
+  String paddedLocalIP = "    " + ip.toString() + "    ";
   matrix.textFont(Font_5x7);
   matrix.beginText(0, 1, 0xFFFFFF);
   matrix.println(paddedLocalIP);
