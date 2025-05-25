@@ -15,6 +15,11 @@ Welcome to Wible — an innovative app that empowers you to harness the full pot
 
 - **OTA UPDATE OVER BLE:** Perform **Over-The-Air firmware updates** on supported microcontrollers directly from your smartphone using a `.bin` file. Just export the binary, place it on your phone, and flash it wirelessly. This feature offers **rock-solid reliability** and **blazing-fast transfer speeds**, making firmware updates effortless and efficient.
 
+  Watch the full tutorial on how to use Wible's OTA Update Over BLE Feature:  
+  <a href="https://youtu.be/tNsKBtISKOY">
+    <img src="https://img.youtube.com/vi/tNsKBtISKOY/0.jpg" alt="Watch the video" width="250">
+  </a>
+
 - **WIRELESS HID:** Transform your smartphone into a **full-fledged keyboard, touchpad, and air gesture mouse** using Wible's Wireless HID feature. Operating over WiFi with the UDP protocol, this feature enables you to control any device that supports USB keyboard and mouse inputs, unlocking a new dimension of interactivity and control.
 
 - **STEER FREELY:** Control a variety of DIY robots—including quadruped robots, rovers, omnidirectional robots, robotic cars, and robot dogs—using Wible’s multitouch interface. Enjoy **super low latency** for a **responsive** and **intuitive** control experience.
