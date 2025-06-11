@@ -56,7 +56,12 @@ class MyServerCallbacks : public BLEServerCallbacks {
 
   void onDisconnect(BLEServer* pServer) {
     deviceConnected = false;
-    otaInProgress = false;
+    // Cancel OTA update on disconnect
+    if (otaInProgress) {
+      Serial.println("[OTA] Update cancelled.");
+      Update.end(false); // Abort the update process
+      otaInProgress = false;
+    }
     // Restart advertising after disconnecting
     pServer->getAdvertising()->start();
     Serial.println("[BLE] Device disconnected. Re-advertising...");
