@@ -25,23 +25,33 @@
 #include <BLE2902.h>
 #include <Update.h>
 
+// Check ESP32 board definition version
+#if defined(ESP_ARDUINO_VERSION_MAJOR) && defined(ESP_ARDUINO_VERSION_MINOR) && defined(ESP_ARDUINO_VERSION_PATCH)
+  #if (ESP_ARDUINO_VERSION_MAJOR > 3) || \
+      (ESP_ARDUINO_VERSION_MAJOR == 3 && ESP_ARDUINO_VERSION_MINOR > 2) || \
+      (ESP_ARDUINO_VERSION_MAJOR == 3 && ESP_ARDUINO_VERSION_MINOR == 2 && ESP_ARDUINO_VERSION_PATCH > 1)
+    #error "ESP32 Arduino Core version is unsupported. Please downgrade to version 3.2.1."
+  #endif
+#endif
+
 #ifdef _BLE_DEVICE_H_
   #error "Conflicting BLE library detected (possibly ArduinoBLE). Please remove it to proceed."
 #endif
 
+// UUIDs for BLE service and characteristic
+#define SERVICE_UUID           "66443771-D481-49B0-BE32-8CE24AC0F09C"
+#define CHARACTERISTIC_UUID    "66443772-D481-49B0-BE32-8CE24AC0F09C"
+
+// BLE server/characteristic pointers and connection state
 BLEServer *pServer = NULL;
 BLECharacteristic *pCharacteristic = NULL;
 bool deviceConnected = false;
 
-// OTA Update Variables
+// OTA update variables
 bool otaInProgress = false;
 uint32_t otaFileSize = 0;
 uint32_t otaReceived = 0;
 int lastProgressPercent = -1;
-
-// UUIDs for BLE Service and Characteristic
-#define SERVICE_UUID           "66443771-D481-49B0-BE32-8CE24AC0F09C"
-#define CHARACTERISTIC_UUID    "66443772-D481-49B0-BE32-8CE24AC0F09C"
 
 // Counter and timing variables
 int counter = 0;
