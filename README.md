@@ -2,9 +2,7 @@
 
 ## Unleash the Power of DIY Technology.
 
-![WARNING](https://img.shields.io/badge/WARNING-Use%203.2.1-red)
-
-**⚠️ WARNING:** ESP32 Arduino Core versions above 3.2.1 currently break BLE functionality. Please use version 3.2.1 when flashing or updating ESP32 boards.
+<p><span style="color: #ff0000;"><strong>⚠️ WARNING:</strong> ESP32 Arduino Core versions above 3.2.1 currently break BLE functionality. Please use version 3.2.1 when flashing or updating ESP32 boards.</span></p>
 
 Welcome to Wible — an innovative app that empowers you to harness the full potential of BLE (Bluetooth Low Energy) and WiFi on your Android and iOS devices. With Wible, you can connect to popular BLE-based microcontrollers and modules, control devices over WiFi, and even perform blazing-fast OTA firmware updates over BLE. Transform your smartphone into a powerful wireless serial monitor, a versatile control unit, a wireless HID interface, and now, a mobile firmware flashing tool for your DIY hardware projects.
 
