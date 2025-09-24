@@ -6,14 +6,12 @@
 
 #include <ArduinoBLE.h>
 
-#ifndef _WIBLE_ENABLED_
-  #error "Please install the modified ArduinoBLE library from: https://github.com/Rupakpoddar/WibleCodeTemplate/raw/master/Arduino/ArduinoBLE.zip"
-#endif
-
-// Create BLE service & characteristic to allow remote device to read, write, and notify
-BLEService TX_RX_Service("19B10010-E8F2-537E-4F6C-D104768A1214");
-BLECharacteristic TX_RX_Characteristic("19B10011-E8F2-537E-4F6C-D104768A1214", 
-                                        BLERead | BLEWriteWithoutResponse | BLENotify, 20);
+// Create UART BLE service with separate RX and TX characteristics
+BLEService uartService("00000001-0000-FEED-0000-000000000000");
+BLECharacteristic rxCharacteristic("00000002-0000-FEED-0000-000000000000",
+                                   BLEWriteWithoutResponse, 247); // BLEWriteWithoutResponse (No ACK --> faster) can be replaced with BLEWrite 
+BLECharacteristic txCharacteristic("00000003-0000-FEED-0000-000000000000",
+                                   BLERead | BLENotify, 247); // BLENotify (No ACK --> faster) can be replaced with BLEIndicate
 
 // Initialize counter and timing variables
 int counter = 0;
@@ -39,11 +37,12 @@ void setup() {
   // Configure BLE device parameters
   BLE.setLocalName("Wible");
   BLE.setDeviceName("Wible");
-  BLE.setAdvertisedService(TX_RX_Service);
+  BLE.setAdvertisedService(uartService);
 
-  // Add the characteristic to the service and add the service
-  TX_RX_Service.addCharacteristic(TX_RX_Characteristic);
-  BLE.addService(TX_RX_Service);
+  // Add the characteristics to the service and add the service
+  uartService.addCharacteristic(rxCharacteristic);
+  uartService.addCharacteristic(txCharacteristic);
+  BLE.addService(uartService);
 
   // Start advertising BLE service
   BLE.advertise();
@@ -64,9 +63,9 @@ void loop() {
       deviceConnected = true;
     }
 
-    // If new data is written by the central, print it out.
-    if (TX_RX_Characteristic.written()) {
-      const uint8_t* value = TX_RX_Characteristic.value();
+    // If new data is written to RX characteristic, print it out.
+    if (rxCharacteristic.written()) {
+      const uint8_t* value = rxCharacteristic.value();
       String incomingData = String((char*)value);
       Serial.print("Received: ");
       Serial.println(incomingData);
@@ -77,8 +76,8 @@ void loop() {
     if (currentMillis - previousMillis >= interval) {
       previousMillis = currentMillis;
       String msg = "Counter value: " + String(counter) + "\n";
-      // Write counter message to the central
-      TX_RX_Characteristic.writeValue(msg.c_str());
+      // Write counter message to TX characteristic
+      txCharacteristic.writeValue(msg.c_str());
       counter++;
     }
     // Optionally, signal connection via LED (steady ON)
