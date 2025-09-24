@@ -66,7 +66,8 @@ void loop() {
     // If new data is written to RX characteristic, print it out.
     if (rxCharacteristic.written()) {
       const uint8_t* value = rxCharacteristic.value();
-      String incomingData = String((char*)value);
+      int length = rxCharacteristic.valueLength();
+      String incomingData = String((char*)value).substring(0, length);
       Serial.print("Received: ");
       Serial.println(incomingData);
     }
