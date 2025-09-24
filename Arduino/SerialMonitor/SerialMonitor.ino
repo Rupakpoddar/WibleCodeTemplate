@@ -9,9 +9,9 @@
 // Create UART BLE service with separate RX and TX characteristics
 BLEService uartService("00000001-0000-FEED-0000-000000000000");
 BLECharacteristic rxCharacteristic("00000002-0000-FEED-0000-000000000000",
-                                   BLEWriteWithoutResponse, 247); // BLEWriteWithoutResponse (No ACK --> faster) can be replaced with BLEWrite 
+                                   BLEWriteWithoutResponse, 96); // BLEWriteWithoutResponse (No ACK --> faster) can be replaced with BLEWrite 
 BLECharacteristic txCharacteristic("00000003-0000-FEED-0000-000000000000",
-                                   BLERead | BLENotify, 247); // BLENotify (No ACK --> faster) can be replaced with BLEIndicate
+                                   BLERead | BLENotify, 96); // BLENotify (No ACK --> faster) can be replaced with BLEIndicate
 
 // Initialize counter and timing variables
 int counter = 0;
