@@ -6,14 +6,12 @@
 
 #include <ArduinoBLE.h>
 
-#ifndef _WIBLE_ENABLED_
-  #error "Please install the modified ArduinoBLE library from: https://github.com/Rupakpoddar/WibleCodeTemplate/raw/master/Arduino/ArduinoBLE.zip"
-#endif
-
-// Create BLE service & characteristic to allow remote device to read, write, and notify
-BLEService TX_RX_Service("19B10010-E8F2-537E-4F6C-D104768A1214");
-BLECharacteristic TX_RX_Characteristic("19B10011-E8F2-537E-4F6C-D104768A1214", 
-                                        BLERead | BLEWriteWithoutResponse | BLENotify, 20);
+// Create UART BLE service with separate RX and TX characteristics
+BLEService uartService("00000001-0000-FEED-0000-000000000000");
+BLECharacteristic rxCharacteristic("00000002-0000-FEED-0000-000000000000",
+                                   BLEWriteWithoutResponse, 96);
+BLECharacteristic txCharacteristic("00000003-0000-FEED-0000-000000000000",
+                                   BLERead | BLENotify, 96);
 
 // Set verbose flag to enable print statements.
 bool verbose = true;
@@ -59,11 +57,12 @@ void setup() {
   // Configure BLE parameters
   BLE.setLocalName("Wible");
   BLE.setDeviceName("Wible");
-  BLE.setAdvertisedService(TX_RX_Service);
+  BLE.setAdvertisedService(uartService);
 
-  // Add the characteristic to the service and add the service
-  TX_RX_Service.addCharacteristic(TX_RX_Characteristic);
-  BLE.addService(TX_RX_Service);
+  // Add the characteristics to the service and add the service
+  uartService.addCharacteristic(rxCharacteristic);
+  uartService.addCharacteristic(txCharacteristic);
+  BLE.addService(uartService);
 
   // Start advertising BLE service
   BLE.advertise();
@@ -89,10 +88,11 @@ void loop() {
       deviceConnected = true;
     }
 
-    // Check if central has written new data to the TX_RX characteristic
-    if (TX_RX_Characteristic.written()) {
-      const uint8_t* value = TX_RX_Characteristic.value();
-      String receivedString = String((char*)value);
+    // Check if central has written new data to the RX characteristic
+    if (rxCharacteristic.written()) {
+      const uint8_t* value = rxCharacteristic.value();
+      int length = rxCharacteristic.valueLength();
+      String receivedString = String((char*)value).substring(0, length);
 
       if (verbose) {
         Serial.print("\n----- Received String: ");
