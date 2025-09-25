@@ -10,26 +10,19 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 
-// Check ESP32 board definition version
-#if defined(ESP_ARDUINO_VERSION_MAJOR) && defined(ESP_ARDUINO_VERSION_MINOR) && defined(ESP_ARDUINO_VERSION_PATCH)
-  #if (ESP_ARDUINO_VERSION_MAJOR > 3) || \
-      (ESP_ARDUINO_VERSION_MAJOR == 3 && ESP_ARDUINO_VERSION_MINOR > 2) || \
-      (ESP_ARDUINO_VERSION_MAJOR == 3 && ESP_ARDUINO_VERSION_MINOR == 2 && ESP_ARDUINO_VERSION_PATCH > 1)
-    #error "ESP32 Arduino Core version is unsupported. Please downgrade to version 3.2.1."
-  #endif
-#endif
-
 #ifdef _BLE_DEVICE_H_
   #error "Conflicting BLE library detected (possibly ArduinoBLE). Please remove it to proceed."
 #endif
 
-// UUIDs for the BLE service and characteristic
-#define SERVICE_UUID           "66443771-D481-49B0-BE32-8CE24AC0F09C"
-#define CHARACTERISTIC_UUID    "66443772-D481-49B0-BE32-8CE24AC0F09C"
+// UUIDs for the BLE service and characteristics
+#define UART_SERVICE_UUID      "00000001-0000-FEED-0000-000000000000"
+#define RX_CHARACTERISTIC_UUID "00000002-0000-FEED-0000-000000000000"
+#define TX_CHARACTERISTIC_UUID "00000003-0000-FEED-0000-000000000000"
 
 // BLE server/characteristic pointers and connection state
 BLEServer *pServer = NULL;
-BLECharacteristic *pCharacteristic = NULL;
+BLECharacteristic *pRxCharacteristic = NULL;
+BLECharacteristic *pTxCharacteristic = NULL;
 bool deviceConnected = false;
 
 // Initialize counter
@@ -74,26 +67,29 @@ void setup() {
   pServer->setCallbacks(new MyServerCallbacks());
 
   // Create the BLE Service
-  BLEService *pService = pServer->createService(SERVICE_UUID);
+  BLEService *pService = pServer->createService(UART_SERVICE_UUID);
 
-  // Create the BLE Characteristic
-  pCharacteristic = pService->createCharacteristic(
-    CHARACTERISTIC_UUID,
+  // Create the RX Characteristic (write_nr)
+  pRxCharacteristic = pService->createCharacteristic(
+    RX_CHARACTERISTIC_UUID,
+    BLECharacteristic::PROPERTY_WRITE_NR
+  );
+  pRxCharacteristic->setCallbacks(new MyCallbacks());
+
+  // Create the TX Characteristic (read, notify)
+  pTxCharacteristic = pService->createCharacteristic(
+    TX_CHARACTERISTIC_UUID,
     BLECharacteristic::PROPERTY_READ |
-    BLECharacteristic::PROPERTY_WRITE |
-    BLECharacteristic::PROPERTY_WRITE_NR |
     BLECharacteristic::PROPERTY_NOTIFY
   );
-
-  pCharacteristic->addDescriptor(new BLE2902());
-  pCharacteristic->setCallbacks(new MyCallbacks());
+  pTxCharacteristic->addDescriptor(new BLE2902());
 
   // Start the service
   pService->start();
 
   // Start advertising
   BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
-  pAdvertising->addServiceUUID(SERVICE_UUID);
+  pAdvertising->addServiceUUID(UART_SERVICE_UUID);
   pAdvertising->setScanResponse(true);
   pAdvertising->setMinPreferred(0x06);
   pAdvertising->setMinPreferred(0x12);
@@ -115,8 +111,8 @@ void loop() {
       String counterString = "Counter value: " + String(counter) + "\n";
 
       // Write the counter value to remote device
-      pCharacteristic->setValue(counterString.c_str());
-      pCharacteristic->notify();
+      pTxCharacteristic->setValue(counterString.c_str());
+      pTxCharacteristic->notify();
       
       // Increment the counter
       counter++;
