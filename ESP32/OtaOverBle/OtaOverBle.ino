@@ -29,13 +29,19 @@
   #error "Conflicting BLE library detected (possibly ArduinoBLE). Please remove it to proceed."
 #endif
 
-// UUIDs for BLE service and characteristic
-#define SERVICE_UUID           "66443771-D481-49B0-BE32-8CE24AC0F09C"
-#define CHARACTERISTIC_UUID    "66443772-D481-49B0-BE32-8CE24AC0F09C"
+// UUIDs for BLE services and characteristics
+#define UART_SERVICE_UUID      "00000001-0000-FEED-0000-000000000000"
+#define RX_CHARACTERISTIC_UUID "00000002-0000-FEED-0000-000000000000"
+#define TX_CHARACTERISTIC_UUID "00000003-0000-FEED-0000-000000000000"
+
+#define UPDATE_SERVICE_UUID       "00000001-0000-C0DE-0000-000000000000"
+#define UPDATE_CHARACTERISTIC_UUID "00000002-0000-C0DE-0000-000000000000"
 
 // BLE server/characteristic pointers and connection state
 BLEServer *pServer = NULL;
-BLECharacteristic *pCharacteristic = NULL;
+BLECharacteristic *pRxCharacteristic = NULL;
+BLECharacteristic *pTxCharacteristic = NULL;
+BLECharacteristic *pUpdateCharacteristic = NULL;
 bool deviceConnected = false;
 
 // OTA update variables
@@ -69,7 +75,21 @@ class MyServerCallbacks : public BLEServerCallbacks {
   }
 };
 
-class MyCallbacks : public BLECharacteristicCallbacks {
+class UartCallbacks : public BLECharacteristicCallbacks {
+  void onWrite(BLECharacteristic *pCharacteristic) {
+    uint8_t* data = pCharacteristic->getData();
+    size_t length = pCharacteristic->getLength();
+
+    if (length == 0) return;
+
+    // Handle regular UART input
+    Serial.print("[Console] ");
+    Serial.write(data, length);
+    Serial.println();
+  }
+};
+
+class UpdateCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic *pCharacteristic) {
     uint8_t* data = pCharacteristic->getData();
     size_t length = pCharacteristic->getLength();
@@ -77,8 +97,8 @@ class MyCallbacks : public BLECharacteristicCallbacks {
     if (length == 0) return;
 
     // Check for OTA start command "OPEN"
-    if (!otaInProgress && length == 4 && 
-        memcmp(data, "\x4F\x50\x45\x4E", 4) == 0) {
+    if (!otaInProgress && length == 4 &&
+        memcmp(data, "OPEN", 4) == 0) {
       Serial.println("[OTA] Update started.");
       otaInProgress = true;
       otaFileSize = 0;
@@ -88,8 +108,8 @@ class MyCallbacks : public BLECharacteristicCallbacks {
     }
 
     // Check for OTA cancel command "HALT" during an OTA update
-    if (otaInProgress && length == 4 && 
-        memcmp(data, "\x48\x41\x4C\x54", 4) == 0) {
+    if (otaInProgress && length == 4 &&
+        memcmp(data, "HALT", 4) == 0) {
       Serial.println("[OTA] Update cancelled.");
       Update.end(false); // Abort the update process
       otaInProgress = false;
@@ -109,7 +129,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
       }
 
       // Check for OTA end command "DONE"
-      if (length == 4 && memcmp(data, "\x44\x4F\x4E\x45", 4) == 0) {
+      if (length == 4 && memcmp(data, "DONE", 4) == 0) {
         Serial.println("[OTA] Finalizing update.");
 
         if (otaReceived != otaFileSize) {
@@ -141,11 +161,6 @@ class MyCallbacks : public BLECharacteristicCallbacks {
           }
         }
       }
-    } else {
-      // Handle regular input
-      Serial.print("[Console] ");
-      Serial.write(data, length);
-      Serial.println();
     }
   }
 };
@@ -156,19 +171,47 @@ void setup() {
   pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
 
-  BLEService *pService = pServer->createService(SERVICE_UUID);
-  pCharacteristic = pService->createCharacteristic(
-    CHARACTERISTIC_UUID,
+  // Create UART Service
+  BLEService *pUartService = pServer->createService(UART_SERVICE_UUID);
+
+  // Create RX Characteristic (write_nr)
+  pRxCharacteristic = pUartService->createCharacteristic(
+    RX_CHARACTERISTIC_UUID,
+    BLECharacteristic::PROPERTY_WRITE_NR
+  );
+  pRxCharacteristic->setCallbacks(new UartCallbacks());
+
+  // Create TX Characteristic (read, notify)
+  pTxCharacteristic = pUartService->createCharacteristic(
+    TX_CHARACTERISTIC_UUID,
     BLECharacteristic::PROPERTY_READ |
-    BLECharacteristic::PROPERTY_WRITE |
-    BLECharacteristic::PROPERTY_WRITE_NR |
     BLECharacteristic::PROPERTY_NOTIFY
   );
+  pTxCharacteristic->addDescriptor(new BLE2902());
 
-  pCharacteristic->addDescriptor(new BLE2902());
-  pCharacteristic->setCallbacks(new MyCallbacks());
-  pService->start();
+  // Create Update Service
+  BLEService *pUpdateService = pServer->createService(UPDATE_SERVICE_UUID);
+
+  // Create Update Characteristic (write_nr)
+  pUpdateCharacteristic = pUpdateService->createCharacteristic(
+    UPDATE_CHARACTERISTIC_UUID,
+    BLECharacteristic::PROPERTY_WRITE_NR
+  );
+  pUpdateCharacteristic->setCallbacks(new UpdateCallbacks());
+
+  // Start both services
+  pUartService->start();
+  pUpdateService->start();
+
+  // Start advertising with both service UUIDs
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+  pAdvertising->addServiceUUID(UART_SERVICE_UUID);
+  pAdvertising->addServiceUUID(UPDATE_SERVICE_UUID);
+  pAdvertising->setScanResponse(true);
+  pAdvertising->setMinPreferred(0x06);
+  pAdvertising->setMinPreferred(0x12);
   BLEDevice::startAdvertising();
+
   Serial.println("[BLE] Device initialized. Advertising...");
 }
 
@@ -178,8 +221,8 @@ void loop() {
     if (currentMillis - previousMillis >= interval) {
       previousMillis = currentMillis;
       String counterString = "Counter: " + String(counter++) + "\n";
-      pCharacteristic->setValue(counterString.c_str());
-      pCharacteristic->notify();
+      pTxCharacteristic->setValue(counterString.c_str());
+      pTxCharacteristic->notify();
     }
   }
 }
