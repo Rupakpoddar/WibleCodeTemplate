@@ -25,15 +25,6 @@
 #include <BLE2902.h>
 #include <Update.h>
 
-// Check ESP32 board definition version
-#if defined(ESP_ARDUINO_VERSION_MAJOR) && defined(ESP_ARDUINO_VERSION_MINOR) && defined(ESP_ARDUINO_VERSION_PATCH)
-  #if (ESP_ARDUINO_VERSION_MAJOR > 3) || \
-      (ESP_ARDUINO_VERSION_MAJOR == 3 && ESP_ARDUINO_VERSION_MINOR > 2) || \
-      (ESP_ARDUINO_VERSION_MAJOR == 3 && ESP_ARDUINO_VERSION_MINOR == 2 && ESP_ARDUINO_VERSION_PATCH > 1)
-    #error "ESP32 Arduino Core version is unsupported. Please downgrade to version 3.2.1."
-  #endif
-#endif
-
 #ifdef _BLE_DEVICE_H_
   #error "Conflicting BLE library detected (possibly ArduinoBLE). Please remove it to proceed."
 #endif
