@@ -1,8 +1,8 @@
-# Helpers for generating BLE advertising payloads.
+# Supporting module for main.py
 
-from micropython import const
 import struct
 import bluetooth
+from micropython import const
 
 # Advertising payloads are repeated packets of the following form:
 #   1 byte data length (N + 1)
