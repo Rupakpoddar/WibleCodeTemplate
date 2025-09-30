@@ -1,8 +1,6 @@
 # Supporting module for main.py
 
 import time
-# import random
-# import struct
 import bluetooth
 from micropython import const
 from ble_advertising import advertising_payload
