@@ -1,12 +1,11 @@
-# This example demonstrates a UART periperhal.
+# Supporting module for main.py
 
-import bluetooth
-import random
-import struct
 import time
-from ble_advertising import advertising_payload
-
+# import random
+# import struct
+import bluetooth
 from micropython import const
+from ble_advertising import advertising_payload
 
 _IRQ_CENTRAL_CONNECT = const(1)
 _IRQ_CENTRAL_DISCONNECT = const(2)
@@ -17,14 +16,18 @@ _FLAG_WRITE_NO_RESPONSE = const(0x0004)
 _FLAG_WRITE = const(0x0008)
 _FLAG_NOTIFY = const(0x0010)
 
-_UART_UUID = bluetooth.UUID("6E400001-B5A3-F393-E0A9-E50E24DCCA9E")
-_UART_TX_RX = (
-    bluetooth.UUID("6E400002-B5A3-F393-E0A9-E50E24DCCA9E"),
-    _FLAG_READ | _FLAG_WRITE | _FLAG_WRITE_NO_RESPONSE | _FLAG_NOTIFY,
+_UART_UUID = bluetooth.UUID("00000001-0000-FEED-0000-000000000000")
+_UART_RX = (
+    bluetooth.UUID("00000002-0000-FEED-0000-000000000000"),
+    _FLAG_WRITE_NO_RESPONSE,
+)
+_UART_TX = (
+    bluetooth.UUID("00000003-0000-FEED-0000-000000000000"),
+    _FLAG_READ | _FLAG_NOTIFY,
 )
 _UART_SERVICE = (
     _UART_UUID,
-    (_UART_TX_RX,),
+    (_UART_RX, _UART_TX,),
 )
 
 
@@ -33,7 +36,9 @@ class BLESimplePeripheral:
         self._ble = ble
         self._ble.active(True)
         self._ble.irq(self._irq)
-        ((self._handle_tx_rx,),) = self._ble.gatts_register_services((_UART_SERVICE,))
+        ((self._handle_rx, self._handle_tx,),) = self._ble.gatts_register_services((_UART_SERVICE,))
+        self._ble.gatts_set_buffer(self._handle_rx, 96)
+        self._ble.gatts_set_buffer(self._handle_tx, 96)
         self._connections = set()
         self._write_callback = None
         self._payload = advertising_payload(name=name, services=[_UART_UUID])
@@ -54,12 +59,12 @@ class BLESimplePeripheral:
         elif event == _IRQ_GATTS_WRITE:
             conn_handle, value_handle = data
             value = self._ble.gatts_read(value_handle)
-            if value_handle == self._handle_tx_rx and self._write_callback:
+            if value_handle == self._handle_rx and self._write_callback:
                 self._write_callback(value)
 
     def send(self, data):
         for conn_handle in self._connections:
-            self._ble.gatts_notify(conn_handle, self._handle_tx_rx, data)
+            self._ble.gatts_notify(conn_handle, self._handle_tx, data)
 
     def is_connected(self):
         return len(self._connections) > 0
