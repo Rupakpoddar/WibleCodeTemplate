@@ -4,6 +4,13 @@
   * Serial Monitor
 */
 
+/*
+  Required library:
+  - ArduinoBLE by Arduino (install via Arduino IDE Library Manager)
+    https://docs.arduino.cc/libraries/arduinoble/
+    or https://github.com/arduino-libraries/ArduinoBLE
+*/
+
 #include <ArduinoBLE.h>
 
 // Create UART BLE service with separate RX and TX characteristics
