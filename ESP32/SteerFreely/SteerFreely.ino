@@ -1,7 +1,13 @@
 /*
-  * Developer: Rupak Poddar
-  * Wible Code Template for ESP32
-  * Steer Freely
+  * Project Information:
+    - Developer: Rupak Poddar
+    - Wible Code Template for ESP32
+    - Tested on: ESP32-C3, ESP32-C6, ESP32-S3
+    - Steer Freely Example
+
+  * Instructions:
+    - After flashing this code, open the Wible app on your smartphone.
+    - Then select "Steer Freely" and look for the listing called "Wible".
 */
 
 #include <Arduino.h>
@@ -37,7 +43,7 @@ bool verbose = true;
 #define M2B 21
 #define LED 22
 
-// Robot control variables
+// Initialize variables
 String receivedString = "";
 unsigned char speed = 100;
 String command = "STOP";
@@ -104,7 +110,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
       }
 
       /*
-        * Utilize the Auxiliary buttons from below
+        * Utilize the auxiliary buttons from below
       */
       // if (command == "AUX1"){}
       // if (command == "AUX2"){}

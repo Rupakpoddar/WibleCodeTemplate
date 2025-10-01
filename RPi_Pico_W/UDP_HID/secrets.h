@@ -2,8 +2,8 @@
               WIFI SETUP
 -------------------------------------*/
 
-#define WIFI_SSID     "YOUR-WIFI-SSID"
-#define WIFI_PASSWORD "YOUR-WIFI-PASSWORD"
+#define WIFI_SSID     "YOUR_WIFI_SSID"
+#define WIFI_PASSWORD "YOUR_WIFI_PASSWORD"
 
 /*-------------------------------------
             END OF WIFI SETUP

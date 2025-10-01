@@ -2,7 +2,7 @@
   * Project Information:
     - Developer: Rupak Poddar
     - Wible Code Template for Arduino Uno R4 WiFi
-    - Serial Monitor Example
+    - Wireless HID Example
   
   * NOTICE: Update WiFi Credentials
     - Before uploading this sketch, open "secrets.h" 

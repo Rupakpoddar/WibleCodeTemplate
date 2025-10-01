@@ -1,27 +1,36 @@
 /*
-  NOTICE: Update WiFi Credentials
+  * Project Information:
+    - Developer: Rupak Poddar
+    - Wible Code Template for Raspberry Pi Pico W
+    - Tested on: RP2040, RP2350 
+    - Wireless HID Example
+  
+  * NOTICE: Update WiFi Credentials
+    - Before uploading this sketch, open "secrets.h" 
+      and update the WiFi SSID and password with your network details.
+  
+  * Board Setup:
+    1. Add Raspberry Pi Pico board definitions to the Arduino IDE:
+      - Open Preferences in the Arduino IDE.
+      - Paste the following URL into the "Additional Board Manager URLs":
+        https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
+      - Open the Boards Manager and install the "Raspberry Pi Pico" package by Earle F. Philhower.
+      
+    2. Programming the Pico W:
+      - Hold the BOOTSEL button while connecting the Raspberry Pi Pico W to your computer.
+      - In the Arduino IDE, select "Raspberry Pi Pico W" as the board.
+      - Select "UF2_Board" for the port.
+      - Upload the code.
 
-  Before uploading this sketch, open "secrets.h" 
-  and update the WiFi SSID and password with your network details.
+    3. Post-Upload Steps:
+      - Reselect the COM Port in the Arduino IDE after uploading the code.
+      - Open the Serial Monitor at 115200 baud to view the board's IP address after a successful WiFi connection.
+      - The default UDP port is 4210.
 
-  Board Setup Instructions:
-  1. Add Raspberry Pi Pico board definitions to the Arduino IDE:
-    - Open Preferences in the Arduino IDE.
-    - Paste the following URL into the "Additional Board Manager URLs":
-      https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
-    - Open the Boards Manager and install the "Raspberry Pi Pico" package by Earle F. Philhower.
-    
-  2. Programming the Pico W:
-    - Hold the BOOTSEL button while connecting the Raspberry Pi Pico W to your computer.
-    - In the Arduino IDE, select "Raspberry Pi Pico W" as the board.
-    - Select "UF2_Board" for the port.
-    - Upload the code.
-
-  3. Post-Upload Steps:
-    - Reselect the COM Port in the Arduino IDE after uploading the code.
-    - Open the Serial Monitor at 115200 baud to view the board's IP address after a successful WiFi connection.
-    
-  The default UDP port is 4210.
+  * Instructions:
+    - After the board connects to the internet, open the Wible app on your smartphone. 
+    - Then select "Wireless HID" and enter the board's IP address and UDP port in the dialog box.
+    - Select "Connect". Make sure the IP address is accessible from your smartphone.
 */
 
 #include "Mouse.h"

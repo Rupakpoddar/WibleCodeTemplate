@@ -1,7 +1,13 @@
 '''
-    - Developer: Rupak Poddar
-    - Wible Code Template for RPi Pico W
-    - Steer Freely
+    # Project Information:
+        - Developer: Rupak Poddar
+        - Wible Code Template for Raspberry Pi Pico W
+        - Tested on: RP2040, RP2350
+        - Steer Freely Example
+
+    # Instructions:
+        - After flashing this code, open the Wible app on your smartphone.
+        - Then select "Steer Freely" and look for the listing called "Wible".
 '''
 
 # Import necessary modules
@@ -72,7 +78,7 @@ def on_rx(data):
         LIGHT.off()
     
     '''    
-    ### Utilize the Auxiliary buttons from below ###
+    ### Utilize the auxiliary buttons from below ###
     
     if command == "AUX1":
         pass

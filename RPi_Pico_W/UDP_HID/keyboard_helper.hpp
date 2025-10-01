@@ -1,3 +1,5 @@
+// Helper file for UDP_HID.ino
+
 #include "Keyboard.h"
 
 const uint8_t switchTable[75] = {

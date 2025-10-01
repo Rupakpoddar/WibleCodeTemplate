@@ -1,7 +1,13 @@
 '''
-    - Developer: Rupak Poddar
-    - Wible Code Template for RPi Pico W
-    - Serial Monitor
+    # Project Information:
+        - Developer: Rupak Poddar
+        - Wible Code Template for Raspberry Pi Pico W
+        - Tested on: RP2040, RP2350
+        - Serial Monitor Example
+
+    # Instructions:
+        - After flashing this code, open the Wible app on your smartphone.
+        - Then select "Serial Monitor" and look for the listing called "Wible".
 '''
 
 # Import necessary modules

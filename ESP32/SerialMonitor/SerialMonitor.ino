@@ -1,7 +1,13 @@
 /*
-  * Developer: Rupak Poddar
-  * Wible Code Template for ESP32
-  * Serial Monitor
+  * Project Information:
+    - Developer: Rupak Poddar
+    - Wible Code Template for ESP32
+    - Tested on: ESP32-C3, ESP32-C6, ESP32-S3
+    - Serial Monitor Example
+
+  * Instructions:
+    - After flashing this code, open the Wible app on your smartphone.
+    - Then select "Serial Monitor" and look for the listing called "Wible".
 */
 
 #include <Arduino.h>
@@ -69,7 +75,7 @@ void setup() {
   // Create the BLE Service
   BLEService *pService = pServer->createService(UART_SERVICE_UUID);
 
-  // Create the RX Characteristic (write_nr)
+  // Create the RX Characteristic (write no response)
   pRxCharacteristic = pService->createCharacteristic(
     RX_CHARACTERISTIC_UUID,
     BLECharacteristic::PROPERTY_WRITE_NR

@@ -33,7 +33,7 @@ bool verbose = true;
 #define M2A 10
 #define M2B 11
 
-// Robot control variables
+// Initialize variables
 String receivedString = "";
 unsigned char speed = 100;
 String command = "STOP";

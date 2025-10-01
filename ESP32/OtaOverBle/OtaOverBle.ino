@@ -1,21 +1,28 @@
 /*
-  This base sketch enables OTA firmware updates via BLE on the ESP32.
-  Flash this code first before attempting any over-the-air updates.
+  * Project Information:
+    - Developer: Rupak Poddar
+    - Wible Code Template for ESP32
+    - Tested on: ESP32-C3, ESP32-C6, ESP32-S3
+    - Firmware Updates Over BLE Example
 
-  To update the firmware:
-  1. Make your code changes in this template or integrate it into your project.
-  2. In Arduino IDE, go to Sketch --> Export Compiled Binary.
-  3. A 'build' folder will be created in your project directory.
-  4. Open the subfolder named after your selected MCU.
-  5. Locate the file with the '.ino.bin' extension and move it to your phone.
+  * NOTE:
+    - This base sketch enables OTA firmware updates via BLE on the ESP32.
+    - Flash this code first before attempting any over-the-air updates.
 
-  Updating via Wible App:
-  1. Open the Wible app and choose OTA Update.
-  2. Connect to your ESP32 device via BLE.
-  3. Select the '.ino.bin' file you placed on your phone.
-  4. Start the update process.
+  * Export Update File:
+    - In the Arduino IDE, select the correct board from Tools --> Board.
+    - Make changes in this template or integrate it into your project.
+    - In Arduino IDE, go to Sketch --> Export Compiled Binary.
+    - A 'build' folder will be created inside your project directory.  
+    - Inside the 'build' folder, open the subfolder named after your selected MCU.  
+    - Locate the file with the '.ino.bin' extension and move it to your phone.
 
-  Once the transfer is complete, the ESP32 will automatically reboot into the new firmware.
+  * Instructions:
+    - Once you’ve completed the steps above, launch the Wible app on your smartphone.
+    - Then select "OTA Update" and look for the listing called "Wible".
+    - Select the '.ino.bin' file you placed on your phone.
+    - Tap the "Start" button in the Wible app to begin the OTA update (file transfer).  
+    - After the transfer is complete, the ESP32 will verify the firmware and automatically reboot into the new version.  
 */
 
 #include <Arduino.h>
