@@ -1,23 +1,25 @@
 /*
-  * Developer: Rupak Poddar
-  * Wible Code Template for HM10 BLE Module
-  * Steer Freely
-*/
+  * Project Information:
+    - Developer: Rupak Poddar
+    - Wible Code Template for HM10 BLE Module
+    - Tested on: Arduino Uno R3
+    - Steer Freely Example
 
-/* 
-  Note: A known drawback of the HM-10 BLE module is its inherent latency in data transmission.
-  Consider using alternatives like Raspberry Pi Pico W, ESP32, or Arduino Uno R4 WiFi for lower latency.
-  The current code handles this delay in the best possible way by introducing the PRECISIONDELAY macro.
+  * Instructions:
+    - After flashing this code, open the Wible app on your smartphone.
+    - Then select "Steer Freely" and look for the HM10 device listing, usually called "HMSoft".
+
+  * NOTE:
+    - A known drawback of the HM-10 BLE module is its inherent latency in data transmission.
+    - Consider using alternatives like Raspberry Pi Pico W, ESP32, or Arduino Uno R4 WiFi for lower latency.
 */
 
 #include <SoftwareSerial.h>
 
 #define PRECISIONDELAY 100
 
-/*
-  * Connect HM10 TX pin to Arduino pin 2
-  * Connect HM10 RX pin to Arduino pin 3
-*/
+// Connect HM10 TX pin to Arduino pin 2
+// Connect HM10 RX pin to Arduino pin 3
 SoftwareSerial HM10(2, 3);
 
 /*
@@ -25,19 +27,15 @@ SoftwareSerial HM10(2, 3);
 */
 bool verbose = true;
 
-/*
-  * Utilize PWM pins for motor drivers
-  * Connect motor driver 1 to Arduino pin 5, 6
-  * Connect motor driver 2 to Arduino pin 10, 11
-*/
+// Utilize PWM pins for motor drivers
+// Connect motor driver 1 to Arduino pin 5, 6
+// Connect motor driver 2 to Arduino pin 10, 11
 #define M1A 5
 #define M1B 6
 #define M2A 10
 #define M2B 11
 
-/*
-  * Initialize the robot with the following values
-*/
+// Initialize variables
 String receivedString = "";
 unsigned char speed = 100;
 String command = "STOP";
@@ -75,9 +73,7 @@ void loop() {
     while (commandStart < receivedString.length()) {
       String currentCommand = receivedString.substring(commandStart, commandStart + 7);
 
-      /*
-        * Ignore the connection response from the module
-      */
+      // Ignore the connection response from HM10 module
       if (currentCommand.substring(0, 3) != "OK+")
         speed = currentCommand.substring(0, 3).toInt();
       
@@ -91,9 +87,7 @@ void loop() {
         Serial.print("\n\n");
       }
 
-      /*
-        * Handle Bluetooth connection lost event
-      */
+      // Handle Bluetooth connection lost event
       if (command == "LOST") {
         ignitionState = false;
         _STOP();
@@ -130,7 +124,7 @@ void loop() {
       }
 
       /*
-        * Utilize the Auxiliary buttons from below
+        * Utilize the auxiliary buttons from below
       */
       // if (command == "AUX1"){}
       // if (command == "AUX2"){}
@@ -145,9 +139,7 @@ void loop() {
       // ignitionState = true;
 
       if (ignitionState) {
-        /*
-          * FORWARD
-        */
+        // FORWARD
         if (command == "FWRD") {
           analogWrite(M1A, speed);
           analogWrite(M1B, 0);
@@ -155,9 +147,7 @@ void loop() {
           analogWrite(M2B, 0);
         }
 
-        /*
-          * BACKWARD
-        */
+        // BACKWARD
         if (command == "BKWD") {
           analogWrite(M1A, 0);
           analogWrite(M1B, speed);
@@ -165,9 +155,7 @@ void loop() {
           analogWrite(M2B, speed);
         }
 
-        /*
-          * LEFT
-        */
+        // LEFT
         if (command == "LEFT") {
           analogWrite(M1A, 0);
           analogWrite(M1B, speed);
@@ -175,9 +163,7 @@ void loop() {
           analogWrite(M2B, 0);
         }
 
-        /*
-          * RIGHT
-        */
+        // RIGHT
         if (command == "RGHT") {
           analogWrite(M1A, speed);
           analogWrite(M1B, 0);

@@ -1,3 +1,5 @@
+// Helper file for UDP_HID.ino
+
 #include "HID.h"
 #include "Keyboard.h"
 

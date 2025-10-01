@@ -1,14 +1,18 @@
 /*
-  * Developer: Rupak Poddar
-  * Wible Code Template for Arduino
-  * Steer Freely
-*/
+  * Project Information:
+    - Developer: Rupak Poddar
+    - Wible Code Template for Arduino (BLE-supported boards)
+    - Tested on: Arduino Uno R4 WiFi
+    - Steer Freely Example
 
-/*
-  Required library:
-  - ArduinoBLE by Arduino (install via Arduino IDE Library Manager)
-    https://docs.arduino.cc/libraries/arduinoble/
-    or https://github.com/arduino-libraries/ArduinoBLE
+  * Instructions:
+    - After flashing this code, open the Wible app on your smartphone.
+    - Then select "Steer Freely" and look for the listing called "Wible".
+
+  * Required Library:
+    - ArduinoBLE by Arduino (install via Arduino IDE Library Manager)
+      https://docs.arduino.cc/libraries/arduinoble/
+      or https://github.com/arduino-libraries/ArduinoBLE
 */
 
 #include <ArduinoBLE.h>

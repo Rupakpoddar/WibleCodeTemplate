@@ -1,16 +1,29 @@
 /*
-  NOTICE: Update WiFi Credentials
+  * Project Information:
+    - Developer: Rupak Poddar
+    - Wible Code Template for Arduino Uno R4 WiFi
+    - Serial Monitor Example
+  
+  * NOTICE: Update WiFi Credentials
+    - Before uploading this sketch, open "secrets.h" 
+      and update the WiFi SSID and password with your network details.
+    - After a successful connection, the board's IP address will be 
+      displayed on the built-in LED matrix. The default UDP port is 4210.
 
-  Before uploading this sketch, open "secrets.h" 
-  and update the WiFi SSID and password with your network details.
+  * Instructions:
+    - After the board connects to the internet, open the Wible app on your smartphone. 
+    - Then select "Wireless HID" and enter the board's IP address and UDP port in the dialog box.
+    - Select "Connect". Make sure the IP address is accessible from your smartphone.
+  
+  * To Reprogram The Board:
+    - Double-press the reset button until the built-in LED starts fading in and out.
+    - Reselect the port in the Arduino IDE.
+    - Upload the new code.
 
-  After a successful connection, the board's IP address will be 
-  displayed on the built-in LED matrix. The default UDP port is 4210.
-
-  To reprogram the board:
-  1. Double-press the reset button until the built-in LED starts fading in and out.
-  2. Reselect the port in the Arduino IDE.
-  3. Upload the new code.
+  * Required Library:
+    - ArduinoGraphics by Arduino (install via Arduino IDE Library Manager)
+      https://docs.arduino.cc/libraries/arduinographics/
+      or https://github.com/arduino-libraries/ArduinoGraphics
 */
 
 #include "Mouse.h"
