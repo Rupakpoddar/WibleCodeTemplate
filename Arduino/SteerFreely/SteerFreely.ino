@@ -17,6 +17,10 @@
 
 #include <ArduinoBLE.h>
 
+#ifdef _WIBLE_ENABLED_
+  #error "A modified ArduinoBLE library is installed. Please remove it and use the official ArduinoBLE library."
+#endif
+
 // Create UART BLE service with separate RX and TX characteristics
 BLEService uartService("00000001-0000-FEED-0000-000000000000");
 BLECharacteristic rxCharacteristic("00000002-0000-FEED-0000-000000000000",
