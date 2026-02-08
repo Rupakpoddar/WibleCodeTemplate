@@ -14,7 +14,6 @@
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
-#include <BLE2902.h>
 
 #ifdef _BLE_DEVICE_H_
   #error "Conflicting BLE library detected (possibly ArduinoBLE). Please remove it to proceed."
@@ -88,7 +87,6 @@ void setup() {
     BLECharacteristic::PROPERTY_READ |
     BLECharacteristic::PROPERTY_NOTIFY
   );
-  pTxCharacteristic->addDescriptor(new BLE2902());
 
   // Start the service
   pService->start();
@@ -99,6 +97,7 @@ void setup() {
   pAdvertising->setScanResponse(true);
   pAdvertising->setMinPreferred(0x06);
   pAdvertising->setMinPreferred(0x12);
+  pAdvertising->setName("Wible");
   BLEDevice::startAdvertising();
   
   Serial.println("Device initialized. Advertising...");

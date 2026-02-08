@@ -29,7 +29,6 @@
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
-#include <BLE2902.h>
 #include <Update.h>
 
 #ifdef _BLE_DEVICE_H_
@@ -194,7 +193,6 @@ void setup() {
     BLECharacteristic::PROPERTY_READ |
     BLECharacteristic::PROPERTY_NOTIFY
   );
-  pTxCharacteristic->addDescriptor(new BLE2902());
 
   // Create Update Service
   BLEService *pUpdateService = pServer->createService(UPDATE_SERVICE_UUID);
@@ -217,6 +215,7 @@ void setup() {
   pAdvertising->setScanResponse(true);
   pAdvertising->setMinPreferred(0x06);
   pAdvertising->setMinPreferred(0x12);
+  pAdvertising->setName("Wible");
   BLEDevice::startAdvertising();
 
   Serial.println("[BLE] Device initialized. Advertising...");
