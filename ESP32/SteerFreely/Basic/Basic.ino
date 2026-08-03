@@ -3,7 +3,7 @@
     - Developer: Rupak Poddar
     - Wible Code Template for ESP32
     - Tested on: ESP32-C3, ESP32-C6, ESP32-S3
-    - Steer Freely Example
+    - Steer Freely Basic Example
 
   * Instructions:
     - After flashing this code, open the Wible app on your smartphone.
@@ -30,39 +30,32 @@ void _STOP(); // Forward declaration
 BLEServer *pServer = NULL;
 BLECharacteristic *pRxCharacteristic = NULL;
 BLECharacteristic *pTxCharacteristic = NULL;
-bool deviceConnected = false;
+volatile bool deviceConnected = false;
 
-// Set verbose flag to enable print statements.
-bool verbose = true;
+// Set VERBOSE flag to enable print statements.
+#define VERBOSE true;
 
-// Motor driver and light pins
+// Motor driver and light GPIOs
 #define M1A 18
 #define M1B 19
 #define M2A 20
 #define M2B 21
 #define LED 22
 
-// Initialize variables
-String receivedString = "";
-unsigned char speed = 100;
-String command = "STOP";
-bool ignitionState = false;
-
 class MyServerCallbacks : public BLEServerCallbacks {
   void onConnect(BLEServer* pServer) {
     deviceConnected = true;
-    if (verbose) {
+    if (VERBOSE) {
       Serial.println("Device connected.");
     }
   }
 
   void onDisconnect(BLEServer* pServer) {
     deviceConnected = false;
-    ignitionState = false;
     _STOP();
     // Restart advertising after disconnecting
     pServer->getAdvertising()->start();
-    if (verbose) {
+    if (VERBOSE) {
       Serial.println("Device disconnected. Re-advertising...");
     }
   }
@@ -72,29 +65,21 @@ class MyCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic *pCharacteristic) {
     String rxValue = pCharacteristic->getValue();
     if (rxValue.length() > 0) {
-      if (verbose) {
+      if (VERBOSE) {
         Serial.print("\n----- Received String: ");
         Serial.print(rxValue);
         Serial.println(" -----\n");
       }
 
       // Split string values: first 3 characters denote speed, next 4 denote command.
-      speed = rxValue.substring(0, 3).toInt();
-      command = rxValue.substring(3, 7);
+      unsigned char speed = rxValue.substring(0, 3).toInt();
+      String command = rxValue.substring(3, 7);
 
-      if (verbose) {
+      if (VERBOSE) {
         Serial.print("Speed: ");
         Serial.println(speed);
         Serial.print("Command: ");
         Serial.println(command);
-      }
-
-      // Process ignition commands
-      if (command == "IGON") {
-        ignitionState = true;
-      } else if (command == "IGOF") {
-        ignitionState = false;
-        _STOP();
       }
 
       // Process STOP and LED commands
@@ -109,23 +94,14 @@ class MyCallbacks : public BLECharacteristicCallbacks {
       }
 
       /*
-        * Utilize the auxiliary buttons from below
+        * Utilize additional function buttons from below
       */
-      // if (command == "AUX1"){}
-      // if (command == "AUX2"){}
-      // if (command == "AUX3"){}
-      // if (command == "AUX4"){}
-      // if (command == "AUX5"){}
-      // if (command == "AUX6"){}
+      // if (command == "FNC1"){}
+      // if (command == "FNC2"){}
+      // if (command == "FNC3"){}
+      // if (command == "FNC4"){}
 
-      /*
-        * Uncomment the following line to disable ignition button
-      */
-      // ignitionState = true;
-
-      // Process motor commands if ignition is enabled
-      if (ignitionState) {
-        // FORWARD
+      // FORWARD
         if (command == "FWRD") {
           analogWrite(M1A, speed);
           analogWrite(M1B, 0);
@@ -161,31 +137,22 @@ class MyCallbacks : public BLECharacteristicCallbacks {
         // if (command == "FRRT") {} // FORWARD + RIGHT
         // if (command == "BKLT") {} // BACKWARD + LEFT
         // if (command == "BKRT") {} // BACKWARD + RIGHT
-      } else {
-        if (verbose) {
-          Serial.println("+------------------------+");
-          Serial.println("|                        |");
-          Serial.println("|   IGNITION STATE OFF   |");
-          Serial.println("|                        |");
-          Serial.println("+------------------------+");
-        }
-      }
     }
   }
 };
 
 void setup() {
-  if (verbose) {
+  if (VERBOSE) {
     Serial.begin(115200);
     delay(100);
     Serial.println("\n\nWible ESP32 Steer Freely\n");
   }
 
-  pinMode(LED, OUTPUT);
   pinMode(M1A, OUTPUT);
   pinMode(M1B, OUTPUT);
   pinMode(M2A, OUTPUT);
   pinMode(M2B, OUTPUT);
+  pinMode(LED, OUTPUT);
 
   _STOP();
 
@@ -223,7 +190,7 @@ void setup() {
   pAdvertising->setName("Wible");
   BLEDevice::startAdvertising();
 
-  if (verbose) {
+  if (VERBOSE) {
     Serial.println("Device initialized. Advertising...");
   }
 }
