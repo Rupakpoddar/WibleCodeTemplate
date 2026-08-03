@@ -27,9 +27,15 @@
 // Set verbose flag to enable print statements
 #define VERBOSE true
 
-// Cap minimum and maximum motor speed
+// Motor speed limits and motion thresholds
 #define MIN_SPEED 80
 #define MAX_SPEED 255
+#define MOTION_MAX_SPEED 160
+#define MOTION_TIMEOUT_MS 250
+#define MOTION_X_UPPER_BOUND (128+32)
+#define MOTION_X_LOWER_BOUND (128-32)
+#define MOTION_Y_UPPER_BOUND (128+32)
+#define MOTION_Y_LOWER_BOUND (128-32)
 
 //                    FRONT 
 //                      ↑ 
@@ -42,8 +48,8 @@
 //          A = Forward | B = Backward
 
 // Motor driver and light GPIOs
-#define M1A 18
-#define M1B 19
+#define M1A 19
+#define M1B 18
 #define M2A 20
 #define M2B 21
 #define M3A 2
@@ -52,11 +58,15 @@
 #define M4B 7
 #define LED 22
 
-// BLE server/characteristic pointers and connection state
+// BLE server/characteristic pointers
 BLEServer *pServer = NULL;
 BLECharacteristic *pRxCharacteristic = NULL;
 BLECharacteristic *pTxCharacteristic = NULL;
+
+// Global variables
 volatile bool deviceConnected = false;
+volatile bool motionActive = false;
+volatile unsigned long lastMotionCommandTime = 0;
 
 // Forward declaration
 void stopMotors();
@@ -84,17 +94,80 @@ class MyCallbacks : public BLECharacteristicCallbacks {
     String rxValue = pCharacteristic->getValue();
     if (rxValue.length() > 0) {
       if (VERBOSE) {
-        Serial.print("\n----- Received String: ");
+        Serial.print("\n----- Received string: ");
         Serial.print(rxValue);
         Serial.println(" -----\n");
       }
 
-      // Parse rxValue in XXXYYYY format: XXX = speed, YYYY = command.
-      unsigned char speed = rxValue.substring(0, 3).toInt();
-      String command = rxValue.substring(3, 7);
+      unsigned char speed = 0;
+      String command = "";
+      
+      if (rxValue.length() == 7) {  // Button input
+        // Parse rxValue in {SSS}{CCCC} format: SSS = speed, CCCC = command.
+        speed = rxValue.substring(0, 3).toInt();
+        command = rxValue.substring(3, 7);
 
-      if (speed != 0) {
-        speed = map(speed, 1, 100, MIN_SPEED, MAX_SPEED);
+        if (speed != 0) {
+          speed = map(speed, 1, 100, MIN_SPEED, MAX_SPEED);
+        }
+      }
+      else if (rxValue.length() == 8) { // Motion input
+        lastMotionCommandTime = millis();
+        motionActive = true;
+
+        // Parse rxValue in X{AAA}Y{BBB} format: AAA = X-axis position from 0 to 255, BBB = Y-axis position from 0 to 255.
+        unsigned char xValue = rxValue.substring(1, 4).toInt();
+        unsigned char yValue = rxValue.substring(5, 8).toInt();
+
+        // Phone position: Neutral
+        if ((xValue <= MOTION_X_UPPER_BOUND)
+            && (xValue >= MOTION_X_LOWER_BOUND)
+            && (yValue <= MOTION_Y_UPPER_BOUND)
+            && (yValue >= MOTION_Y_LOWER_BOUND)) { 
+          stopMotors();
+          return;
+        }
+
+        // Phone position: Forward
+        if ((xValue > MOTION_X_UPPER_BOUND)
+            && (yValue <= MOTION_Y_UPPER_BOUND)
+            && (yValue >= MOTION_Y_LOWER_BOUND)) { 
+          speed = map(xValue, MOTION_X_UPPER_BOUND, 255, MIN_SPEED, MOTION_MAX_SPEED);
+          command = "FWRD";
+        }
+
+        // Phone position: Backward
+        if ((xValue < MOTION_X_LOWER_BOUND)
+            && (yValue <= MOTION_Y_UPPER_BOUND)
+            && (yValue >= MOTION_Y_LOWER_BOUND)) { 
+          speed = map(MOTION_X_LOWER_BOUND-xValue, 0, MOTION_X_LOWER_BOUND, MIN_SPEED, MOTION_MAX_SPEED);
+          command = "BKWD";
+        }
+
+        // Phone position: Left
+        if ((xValue <= MOTION_X_UPPER_BOUND)
+            && (xValue >= MOTION_X_LOWER_BOUND)
+            && (yValue < MOTION_Y_LOWER_BOUND)) { 
+          speed = map(MOTION_Y_LOWER_BOUND-yValue, 0, MOTION_Y_LOWER_BOUND, MIN_SPEED, MOTION_MAX_SPEED);
+          command = "ROLT";
+        }
+
+        // Phone position: Right
+        if ((xValue <= MOTION_X_UPPER_BOUND)
+            && (xValue >= MOTION_X_LOWER_BOUND)
+            && (yValue > MOTION_Y_UPPER_BOUND)) { 
+          speed = map(yValue, MOTION_Y_UPPER_BOUND, 255, MIN_SPEED, MOTION_MAX_SPEED);
+          command = "RORT";
+        }
+
+        // Custom motion behaviors can be added for additional input combinations...
+      }
+      else {
+        stopMotors();
+        if (VERBOSE) {
+          Serial.println("Invalid input");
+        }
+        return;
       }
 
       if (VERBOSE) {
@@ -374,6 +447,13 @@ void loop() {
     delay(250);
     digitalWrite(LED, LOW);
     delay(250);
+  }
+
+  if (motionActive) {
+    if (millis() - lastMotionCommandTime > MOTION_TIMEOUT_MS) {
+      motionActive = false;
+      stopMotors();
+    }
   }
 }
 
