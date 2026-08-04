@@ -22,7 +22,7 @@ Welcome to Wible — an innovative app that empowers you to harness the full pot
 
 - **WIRELESS HID:** Transform your smartphone into a **full-fledged keyboard, touchpad, and air gesture mouse** using Wible's Wireless HID feature. Operating over WiFi with the UDP protocol, this feature enables you to control any device that supports USB keyboard and mouse inputs, unlocking a new dimension of interactivity and control.
 
-- **STEER FREELY:** Control a variety of DIY robots—including quadruped robots, rovers, omnidirectional robots, robotic cars, and robot dogs—using Wible’s multitouch interface. Enjoy **super low latency** for a **responsive** and **intuitive** control experience.
+- **STEER FREELY:** Control a variety of DIY robots—including quadruped robots, rovers, omnidirectional robots, robotic cars, and robot dogs—using Wible’s multitouch interface, or switch to **motion control** and steer by simply tilting your smartphone. A **live RSSI readout** keeps you aware of your link quality and wireless range at all times. Enjoy **super low latency** for a **responsive** and **intuitive** control experience.
 
 ### ✅ **Supported Devices**
 
