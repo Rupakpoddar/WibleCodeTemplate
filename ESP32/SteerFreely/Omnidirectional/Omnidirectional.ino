@@ -2,7 +2,7 @@
   * Project Information:
     - Developer: Rupak Poddar
     - Wible Code Template for ESP32
-    - Tested on: ESP32-C3, ESP32-C6, ESP32-S3
+    - Tested on: ESP32-S3
     - Steer Freely Omnidirectional & Motion Control Example
 
   * Instructions:
@@ -30,7 +30,6 @@
 // Motor speed limits and motion thresholds
 #define MIN_SPEED 80
 #define MAX_SPEED 255
-#define MOTION_MAX_SPEED 160
 #define MOTION_TIMEOUT_MS 250
 #define MOTION_X_UPPER_BOUND (128+32)
 #define MOTION_X_LOWER_BOUND (128-32)
@@ -132,7 +131,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
         if ((xValue > MOTION_X_UPPER_BOUND)
             && (yValue <= MOTION_Y_UPPER_BOUND)
             && (yValue >= MOTION_Y_LOWER_BOUND)) { 
-          speed = map(xValue, MOTION_X_UPPER_BOUND, 255, MIN_SPEED, MOTION_MAX_SPEED);
+          speed = map(xValue, MOTION_X_UPPER_BOUND, 255, MIN_SPEED, MAX_SPEED);
           command = "FWRD";
         }
 
@@ -140,7 +139,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
         if ((xValue < MOTION_X_LOWER_BOUND)
             && (yValue <= MOTION_Y_UPPER_BOUND)
             && (yValue >= MOTION_Y_LOWER_BOUND)) { 
-          speed = map(MOTION_X_LOWER_BOUND-xValue, 0, MOTION_X_LOWER_BOUND, MIN_SPEED, MOTION_MAX_SPEED);
+          speed = map(MOTION_X_LOWER_BOUND-xValue, 0, MOTION_X_LOWER_BOUND, MIN_SPEED, MAX_SPEED);
           command = "BKWD";
         }
 
@@ -148,7 +147,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
         if ((xValue <= MOTION_X_UPPER_BOUND)
             && (xValue >= MOTION_X_LOWER_BOUND)
             && (yValue < MOTION_Y_LOWER_BOUND)) { 
-          speed = map(MOTION_Y_LOWER_BOUND-yValue, 0, MOTION_Y_LOWER_BOUND, MIN_SPEED, MOTION_MAX_SPEED);
+          speed = map(MOTION_Y_LOWER_BOUND-yValue, 0, MOTION_Y_LOWER_BOUND, MIN_SPEED, MAX_SPEED);
           command = "ROLT";
         }
 
@@ -156,7 +155,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
         if ((xValue <= MOTION_X_UPPER_BOUND)
             && (xValue >= MOTION_X_LOWER_BOUND)
             && (yValue > MOTION_Y_UPPER_BOUND)) { 
-          speed = map(yValue, MOTION_Y_UPPER_BOUND, 255, MIN_SPEED, MOTION_MAX_SPEED);
+          speed = map(yValue, MOTION_Y_UPPER_BOUND, 255, MIN_SPEED, MAX_SPEED);
           command = "RORT";
         }
 
