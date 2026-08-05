@@ -2,8 +2,8 @@
   * Project Information:
     - Developer: Rupak Poddar
     - Wible Code Template for ESP32
-    - Tested on: ESP32-S3
-    - Steer Freely Omnidirectional & Motion Control Example
+    - Tested on: ESP32-C3, ESP32-C6, ESP32-S3
+    - Steer Freely Basic & Motion Control Example
 
   * Instructions:
     - After flashing this code, open the Wible app on your smartphone.
@@ -38,24 +38,23 @@
 
 //                    FRONT 
 //                      ↑ 
-//            M1 ○ ┌─────────┐ ○ M2 
-//                 │  ROBOT  │ 
-//            M4 ○ └─────────┘ ○ M3 
+//               ○ ┌─────────┐ ○ 
+//              M1 │  ROBOT  │ M2 
+//               ○ └─────────┘ ○ 
 //                      ↓ 
-//                    BACK
+//                    BACK 
 // 
-//          A = Forward | B = Backward
+//          A = Forward | B = Backward 
 
 // Motor driver and light GPIOs
-#define M1A 19
-#define M1B 18
+#define M1A 18
+#define M1B 19
 #define M2A 20
 #define M2B 21
-#define M3A 2
-#define M3B 3
-#define M4A 6
-#define M4B 7
 #define LED 22
+
+// Forward declaration
+void stopMotors();
 
 // BLE server/characteristic pointers
 BLEServer *pServer = NULL;
@@ -66,9 +65,6 @@ BLECharacteristic *pTxCharacteristic = NULL;
 volatile bool deviceConnected = false;
 volatile bool motionActive = false;
 volatile unsigned long lastMotionCommandTime = 0;
-
-// Forward declaration
-void stopMotors();
 
 class MyServerCallbacks : public BLEServerCallbacks {
   void onConnect(BLEServer* pServer) {
@@ -148,7 +144,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
             && (xValue >= MOTION_X_LOWER_BOUND)
             && (yValue < MOTION_Y_LOWER_BOUND)) { 
           speed = map(MOTION_Y_LOWER_BOUND-yValue, 0, MOTION_Y_LOWER_BOUND, MIN_SPEED, MAX_SPEED);
-          command = "ROLT";
+          command = "LEFT";
         }
 
         // Phone position: Right
@@ -156,10 +152,36 @@ class MyCallbacks : public BLECharacteristicCallbacks {
             && (xValue >= MOTION_X_LOWER_BOUND)
             && (yValue > MOTION_Y_UPPER_BOUND)) { 
           speed = map(yValue, MOTION_Y_UPPER_BOUND, 255, MIN_SPEED, MAX_SPEED);
-          command = "RORT";
+          command = "RGHT";
         }
 
-        // Custom motion behaviors can be added for additional input combinations...
+        // Phone position: Front left
+        if ((xValue > MOTION_X_UPPER_BOUND)
+            && (yValue < MOTION_Y_LOWER_BOUND)) {
+          speed = map(xValue, MOTION_X_UPPER_BOUND, 255, MIN_SPEED, MAX_SPEED);
+          command = "FRLT";
+        }
+
+        // Phone position: Front right
+        if ((xValue > MOTION_X_UPPER_BOUND)
+            && (yValue > MOTION_Y_UPPER_BOUND)) {
+          speed = map(xValue, MOTION_X_UPPER_BOUND, 255, MIN_SPEED, MAX_SPEED);
+          command = "FRRT";
+        }
+
+        // Phone position: Back left
+        if ((xValue < MOTION_X_LOWER_BOUND)
+            && (yValue < MOTION_Y_LOWER_BOUND)) {
+          speed = map(MOTION_X_LOWER_BOUND-xValue, 0, MOTION_X_LOWER_BOUND, MIN_SPEED, MAX_SPEED);
+          command = "BKLT";
+        }
+
+        // Phone position: Back right
+        if ((xValue < MOTION_X_LOWER_BOUND)
+            && (yValue > MOTION_Y_UPPER_BOUND)) {
+          speed = map(MOTION_X_LOWER_BOUND-xValue, 0, MOTION_X_LOWER_BOUND, MIN_SPEED, MAX_SPEED);
+          command = "BKRT";
+        }
       }
       else {
         stopMotors();
@@ -195,172 +217,86 @@ class MyCallbacks : public BLECharacteristicCallbacks {
       if (command == "FWRD") {
         analogWrite(M1A, speed);
         analogWrite(M2A, speed);
-        analogWrite(M3A, speed);
-        analogWrite(M4A, speed);
         analogWrite(M1B, 0);
         analogWrite(M2B, 0);
-        analogWrite(M3B, 0);
-        analogWrite(M4B, 0);
       }
 
       // BACKWARD
       if (command == "BKWD") {
         analogWrite(M1A, 0);
         analogWrite(M2A, 0);
-        analogWrite(M3A, 0);
-        analogWrite(M4A, 0);
         analogWrite(M1B, speed);
         analogWrite(M2B, speed);
-        analogWrite(M3B, speed);
-        analogWrite(M4B, speed);
       }
 
       // LEFT
       if (command == "LEFT") {
         analogWrite(M1A, 0);
         analogWrite(M2A, speed);
-        analogWrite(M3A, 0);
-        analogWrite(M4A, speed);
         analogWrite(M1B, speed);
         analogWrite(M2B, 0);
-        analogWrite(M3B, speed);
-        analogWrite(M4B, 0);
       }
 
       // RIGHT
       if (command == "RGHT") {
         analogWrite(M1A, speed);
         analogWrite(M2A, 0);
-        analogWrite(M3A, speed);
-        analogWrite(M4A, 0);
         analogWrite(M1B, 0);
         analogWrite(M2B, speed);
-        analogWrite(M3B, 0);
-        analogWrite(M4B, speed);
       }
 
       /*
         * Utilize additional control buttons and multi-touch commands from below
       */
       // ROTATE LEFT
-      if (command == "ROLT") {
-        analogWrite(M1A, 0);
-        analogWrite(M2A, speed);
-        analogWrite(M3A, speed);
-        analogWrite(M4A, 0);
-        analogWrite(M1B, speed);
-        analogWrite(M2B, 0);
-        analogWrite(M3B, 0);
-        analogWrite(M4B, speed);
-      }
+      // if (command == "ROLT") {}
 
       // ROTATE RIGHT
-      if (command == "RORT") {
-        analogWrite(M1A, speed);
-        analogWrite(M2A, 0);
-        analogWrite(M3A, 0);
-        analogWrite(M4A, speed);
-        analogWrite(M1B, 0);
-        analogWrite(M2B, speed);
-        analogWrite(M3B, speed);
-        analogWrite(M4B, 0);
-      }
+      // if (command == "RORT") {}
 
       // FORWARD + LEFT
       if (command == "FRLT") {
-        analogWrite(M1A, 0);
+        analogWrite(M1A, speed/2);
         analogWrite(M2A, speed);
-        analogWrite(M3A, 0);
-        analogWrite(M4A, speed);
         analogWrite(M1B, 0);
         analogWrite(M2B, 0);
-        analogWrite(M3B, 0);
-        analogWrite(M4B, 0);
       }
 
       // FORWARD + RIGHT
       if (command == "FRRT") {
         analogWrite(M1A, speed);
-        analogWrite(M2A, 0);
-        analogWrite(M3A, speed);
-        analogWrite(M4A, 0);
+        analogWrite(M2A, speed/2);
         analogWrite(M1B, 0);
         analogWrite(M2B, 0);
-        analogWrite(M3B, 0);
-        analogWrite(M4B, 0);
       }
 
       // FORWARD + ROTATE LEFT
-      if (command == "FRRL") {
-        analogWrite(M1A, speed/2);
-        analogWrite(M2A, speed);
-        analogWrite(M3A, speed);
-        analogWrite(M4A, speed/2);
-        analogWrite(M1B, 0);
-        analogWrite(M2B, 0);
-        analogWrite(M3B, 0);
-        analogWrite(M4B, 0);
-      }
+      // if (command == "FRRL") {}
 
       // FORWARD + ROTATE RIGHT
-      if (command == "FRRR") {
-        analogWrite(M1A, speed);
-        analogWrite(M2A, speed/2);
-        analogWrite(M3A, speed/2);
-        analogWrite(M4A, speed);
-        analogWrite(M1B, 0);
-        analogWrite(M2B, 0);
-        analogWrite(M3B, 0);
-        analogWrite(M4B, 0);
-      }
+      // if (command == "FRRR") {}
 
       // BACKWARD + LEFT
       if (command == "BKLT") {
         analogWrite(M1A, 0);
         analogWrite(M2A, 0);
-        analogWrite(M3A, 0);
-        analogWrite(M4A, 0);
-        analogWrite(M1B, speed);
-        analogWrite(M2B, 0);
-        analogWrite(M3B, speed);
-        analogWrite(M4B, 0);
+        analogWrite(M1B, speed/2);
+        analogWrite(M2B, speed);
       }
 
       // BACKWARD + RIGHT
       if (command == "BKRT") {
         analogWrite(M1A, 0);
         analogWrite(M2A, 0);
-        analogWrite(M3A, 0);
-        analogWrite(M4A, 0);
-        analogWrite(M1B, 0);
-        analogWrite(M2B, speed);
-        analogWrite(M3B, 0);
-        analogWrite(M4B, speed);
+        analogWrite(M1B, speed);
+        analogWrite(M2B, speed/2);
       }
 
       // BACKWARD + ROTATE LEFT
-      if (command == "BKRL") {
-        analogWrite(M1A, 0);
-        analogWrite(M2A, 0);
-        analogWrite(M3A, 0);
-        analogWrite(M4A, 0);
-        analogWrite(M1B, speed/2);
-        analogWrite(M2B, speed);
-        analogWrite(M3B, speed);
-        analogWrite(M4B, speed/2);
-      }
+      // if (command == "BKRL") {}
 
       // BACKWARD + ROTATE RIGHT
-      if (command == "BKRR") {
-        analogWrite(M1A, 0);
-        analogWrite(M2A, 0);
-        analogWrite(M3A, 0);
-        analogWrite(M4A, 0);
-        analogWrite(M1B, speed);
-        analogWrite(M2B, speed/2);
-        analogWrite(M3B, speed/2);
-        analogWrite(M4B, speed);
-      }
+      // if (command == "BKRR") {}
 
       /*
         * Utilize additional function buttons from below
@@ -391,10 +327,6 @@ void setup() {
   pinMode(M1B, OUTPUT);
   pinMode(M2A, OUTPUT);
   pinMode(M2B, OUTPUT);
-  pinMode(M3A, OUTPUT);
-  pinMode(M3B, OUTPUT);
-  pinMode(M4A, OUTPUT);
-  pinMode(M4B, OUTPUT);
   pinMode(LED, OUTPUT);
 
   stopMotors();
@@ -461,8 +393,4 @@ void stopMotors() {
   analogWrite(M1B, 0);
   analogWrite(M2A, 0);
   analogWrite(M2B, 0);
-  analogWrite(M3A, 0);
-  analogWrite(M3B, 0);
-  analogWrite(M4A, 0);
-  analogWrite(M4B, 0);
 }

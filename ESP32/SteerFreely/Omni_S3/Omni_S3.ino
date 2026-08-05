@@ -2,7 +2,7 @@
   * Project Information:
     - Developer: Rupak Poddar
     - Wible Code Template for ESP32
-    - Tested on: ESP32-C3, ESP32-C6
+    - Tested on: ESP32-S3
     - Steer Freely Omnidirectional & Motion Control Example
 
   * Instructions:
@@ -14,7 +14,6 @@
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
-#include <Adafruit_NeoPixel.h>
 
 #ifdef _BLE_DEVICE_H_
   #error "Conflicting BLE library detected (possibly ArduinoBLE). Please remove it to proceed."
@@ -37,69 +36,31 @@
 #define MOTION_Y_UPPER_BOUND (128+32)
 #define MOTION_Y_LOWER_BOUND (128-32)
 
-//                    FRONT
-//                      ↑
-//            M1 ○ ┌─────────┐ ○ M2
-//                 │  ROBOT  │
-//            M4 ○ └─────────┘ ○ M3
-//                      ↓
-//                    BACK
-//
-//          A = Forward | B = Backward
+//                    FRONT 
+//                      ↑ 
+//            M1 ○ ┌─────────┐ ○ M2 
+//                 │  ROBOT  │ 
+//            M4 ○ └─────────┘ ○ M3 
+//                      ↓ 
+//                    BACK 
+// 
+//          A = Forward | B = Backward 
 
-// Motor driver GPIOs
-#define M1A 19
-#define M1B 18
+// Motor driver and light GPIOs
+#define M1A 18
+#define M1B 19
 #define M2A 20
 #define M2B 21
 #define M3A 2
 #define M3B 3
 #define M4A 6
 #define M4B 7
+#define LED 22
 
-// WS2812B light strip
-#define LED_PIN 4
-#define LED_COUNT 4
-#define LED_BRIGHTNESS 100  // 0-255
-
-Adafruit_NeoPixel lights(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
-
-/*
-  * ESP32-C3 and ESP32-C6 only provide 6 LEDC (PWM) channels, but this robot
-    has 8 motor pins. Driving all 8 with analogWrite() silently fails on the
-    last two pins. Instead, each motor owns a single LEDC channel that is moved
-    between its A and B pin whenever the direction changes, since only one side
-    of an H-bridge is ever driven at a time. The idle side is held LOW digitally.
-*/
-#define PWM_FREQ 1000
-#define PWM_RESOLUTION 8
-
-// Motor indices
-#define M1 0
-#define M2 1
-#define M3 2
-#define M4 3
-
-struct Motor {
-  uint8_t pinA;
-  uint8_t pinB;
-  uint8_t channel;
-  int8_t driven;  // -1 = coasting, 0 = pinA attached, 1 = pinB attached
-};
-
-Motor motors[4] = {
-  {M1A, M1B, 0, -1},
-  {M2A, M2B, 1, -1},
-  {M3A, M3B, 2, -1},
-  {M4A, M4B, 3, -1}
-};
-
-// Forward declarations
-void setMotor(uint8_t index, uint8_t speedA, uint8_t speedB);
+// Forward declaration
 void stopMotors();
-void setLights(uint8_t r, uint8_t g, uint8_t b);
 
-// BLE server/characteristic pointers and connection state
+// BLE server/characteristic pointers
 BLEServer *pServer = NULL;
 BLECharacteristic *pRxCharacteristic = NULL;
 BLECharacteristic *pTxCharacteristic = NULL;
@@ -132,7 +93,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
     String rxValue = pCharacteristic->getValue();
     if (rxValue.length() > 0) {
       if (VERBOSE) {
-        Serial.print("\n----- Received String: ");
+        Serial.print("\n----- Received string: ");
         Serial.print(rxValue);
         Serial.println(" -----\n");
       }
@@ -170,7 +131,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
         if ((xValue > MOTION_X_UPPER_BOUND)
             && (yValue <= MOTION_Y_UPPER_BOUND)
             && (yValue >= MOTION_Y_LOWER_BOUND)) { 
-          speed = map(xValue, MOTION_X_UPPER_BOUND, 255, MIN_SPEED, 160);
+          speed = map(xValue, MOTION_X_UPPER_BOUND, 255, MIN_SPEED, MAX_SPEED);
           command = "FWRD";
         }
 
@@ -178,7 +139,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
         if ((xValue < MOTION_X_LOWER_BOUND)
             && (yValue <= MOTION_Y_UPPER_BOUND)
             && (yValue >= MOTION_Y_LOWER_BOUND)) { 
-          speed = map(MOTION_X_LOWER_BOUND-xValue, 0, MOTION_X_LOWER_BOUND, MIN_SPEED, 160);
+          speed = map(MOTION_X_LOWER_BOUND-xValue, 0, MOTION_X_LOWER_BOUND, MIN_SPEED, MAX_SPEED);
           command = "BKWD";
         }
 
@@ -186,7 +147,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
         if ((xValue <= MOTION_X_UPPER_BOUND)
             && (xValue >= MOTION_X_LOWER_BOUND)
             && (yValue < MOTION_Y_LOWER_BOUND)) { 
-          speed = map(MOTION_Y_LOWER_BOUND-yValue, 0, MOTION_Y_LOWER_BOUND, MIN_SPEED, 120);
+          speed = map(MOTION_Y_LOWER_BOUND-yValue, 0, MOTION_Y_LOWER_BOUND, MIN_SPEED, MAX_SPEED);
           command = "ROLT";
         }
 
@@ -194,11 +155,37 @@ class MyCallbacks : public BLECharacteristicCallbacks {
         if ((xValue <= MOTION_X_UPPER_BOUND)
             && (xValue >= MOTION_X_LOWER_BOUND)
             && (yValue > MOTION_Y_UPPER_BOUND)) { 
-          speed = map(yValue, MOTION_Y_UPPER_BOUND, 255, MIN_SPEED, 120);
+          speed = map(yValue, MOTION_Y_UPPER_BOUND, 255, MIN_SPEED, MAX_SPEED);
           command = "RORT";
         }
 
-        // Custom motion behaviors can be added for additional input combinations...
+        // Phone position: Front left
+        if ((xValue > MOTION_X_UPPER_BOUND)
+            && (yValue < MOTION_Y_LOWER_BOUND)) {
+          speed = map(xValue, MOTION_X_UPPER_BOUND, 255, MIN_SPEED, MAX_SPEED);
+          command = "FRRL";
+        }
+
+        // Phone position: Front right
+        if ((xValue > MOTION_X_UPPER_BOUND)
+            && (yValue > MOTION_Y_UPPER_BOUND)) {
+          speed = map(xValue, MOTION_X_UPPER_BOUND, 255, MIN_SPEED, MAX_SPEED);
+          command = "FRRR";
+        }
+
+        // Phone position: Back left
+        if ((xValue < MOTION_X_LOWER_BOUND)
+            && (yValue < MOTION_Y_LOWER_BOUND)) {
+          speed = map(MOTION_X_LOWER_BOUND-xValue, 0, MOTION_X_LOWER_BOUND, MIN_SPEED, MAX_SPEED);
+          command = "BKRL";
+        }
+
+        // Phone position: Back right
+        if ((xValue < MOTION_X_LOWER_BOUND)
+            && (yValue > MOTION_Y_UPPER_BOUND)) {
+          speed = map(MOTION_X_LOWER_BOUND-xValue, 0, MOTION_X_LOWER_BOUND, MIN_SPEED, MAX_SPEED);
+          command = "BKRR";
+        }
       }
       else {
         stopMotors();
@@ -222,44 +209,60 @@ class MyCallbacks : public BLECharacteristicCallbacks {
 
       // LED ON
       if (command == "LTON") {
-        setLights(255, 255, 255);
+        digitalWrite(LED, HIGH);
       }
 
       // LED OFF
       if (command == "LTOF") {
-        setLights(0, 0, 0);
+        digitalWrite(LED, LOW);
       }
 
       // FORWARD
       if (command == "FWRD") {
-        setMotor(M1, speed, 0);
-        setMotor(M2, speed, 0);
-        setMotor(M3, speed, 0);
-        setMotor(M4, speed, 0);
+        analogWrite(M1A, speed);
+        analogWrite(M2A, speed);
+        analogWrite(M3A, speed);
+        analogWrite(M4A, speed);
+        analogWrite(M1B, 0);
+        analogWrite(M2B, 0);
+        analogWrite(M3B, 0);
+        analogWrite(M4B, 0);
       }
 
       // BACKWARD
       if (command == "BKWD") {
-        setMotor(M1, 0, speed);
-        setMotor(M2, 0, speed);
-        setMotor(M3, 0, speed);
-        setMotor(M4, 0, speed);
+        analogWrite(M1A, 0);
+        analogWrite(M2A, 0);
+        analogWrite(M3A, 0);
+        analogWrite(M4A, 0);
+        analogWrite(M1B, speed);
+        analogWrite(M2B, speed);
+        analogWrite(M3B, speed);
+        analogWrite(M4B, speed);
       }
 
       // LEFT
       if (command == "LEFT") {
-        setMotor(M1, 0, speed);
-        setMotor(M2, speed, 0);
-        setMotor(M3, 0, speed);
-        setMotor(M4, speed, 0);
+        analogWrite(M1A, 0);
+        analogWrite(M2A, speed);
+        analogWrite(M3A, 0);
+        analogWrite(M4A, speed);
+        analogWrite(M1B, speed);
+        analogWrite(M2B, 0);
+        analogWrite(M3B, speed);
+        analogWrite(M4B, 0);
       }
 
       // RIGHT
       if (command == "RGHT") {
-        setMotor(M1, speed, 0);
-        setMotor(M2, 0, speed);
-        setMotor(M3, speed, 0);
-        setMotor(M4, 0, speed);
+        analogWrite(M1A, speed);
+        analogWrite(M2A, 0);
+        analogWrite(M3A, speed);
+        analogWrite(M4A, 0);
+        analogWrite(M1B, 0);
+        analogWrite(M2B, speed);
+        analogWrite(M3B, 0);
+        analogWrite(M4B, speed);
       }
 
       /*
@@ -267,82 +270,122 @@ class MyCallbacks : public BLECharacteristicCallbacks {
       */
       // ROTATE LEFT
       if (command == "ROLT") {
-        setMotor(M1, 0, speed);
-        setMotor(M2, speed, 0);
-        setMotor(M3, speed, 0);
-        setMotor(M4, 0, speed);
+        analogWrite(M1A, 0);
+        analogWrite(M2A, speed);
+        analogWrite(M3A, speed);
+        analogWrite(M4A, 0);
+        analogWrite(M1B, speed);
+        analogWrite(M2B, 0);
+        analogWrite(M3B, 0);
+        analogWrite(M4B, speed);
       }
 
       // ROTATE RIGHT
       if (command == "RORT") {
-        setMotor(M1, speed, 0);
-        setMotor(M2, 0, speed);
-        setMotor(M3, 0, speed);
-        setMotor(M4, speed, 0);
+        analogWrite(M1A, speed);
+        analogWrite(M2A, 0);
+        analogWrite(M3A, 0);
+        analogWrite(M4A, speed);
+        analogWrite(M1B, 0);
+        analogWrite(M2B, speed);
+        analogWrite(M3B, speed);
+        analogWrite(M4B, 0);
       }
 
       // FORWARD + LEFT
       if (command == "FRLT") {
-        setMotor(M1, 0, 0);
-        setMotor(M2, speed, 0);
-        setMotor(M3, 0, 0);
-        setMotor(M4, speed, 0);
+        analogWrite(M1A, 0);
+        analogWrite(M2A, speed);
+        analogWrite(M3A, 0);
+        analogWrite(M4A, speed);
+        analogWrite(M1B, 0);
+        analogWrite(M2B, 0);
+        analogWrite(M3B, 0);
+        analogWrite(M4B, 0);
       }
 
       // FORWARD + RIGHT
       if (command == "FRRT") {
-        setMotor(M1, speed, 0);
-        setMotor(M2, 0, 0);
-        setMotor(M3, speed, 0);
-        setMotor(M4, 0, 0);
+        analogWrite(M1A, speed);
+        analogWrite(M2A, 0);
+        analogWrite(M3A, speed);
+        analogWrite(M4A, 0);
+        analogWrite(M1B, 0);
+        analogWrite(M2B, 0);
+        analogWrite(M3B, 0);
+        analogWrite(M4B, 0);
       }
 
       // FORWARD + ROTATE LEFT
       if (command == "FRRL") {
-        setMotor(M1, speed / 2, 0);
-        setMotor(M2, speed, 0);
-        setMotor(M3, speed, 0);
-        setMotor(M4, speed / 2, 0);
+        analogWrite(M1A, speed/2);
+        analogWrite(M2A, speed);
+        analogWrite(M3A, speed);
+        analogWrite(M4A, speed/2);
+        analogWrite(M1B, 0);
+        analogWrite(M2B, 0);
+        analogWrite(M3B, 0);
+        analogWrite(M4B, 0);
       }
 
       // FORWARD + ROTATE RIGHT
       if (command == "FRRR") {
-        setMotor(M1, speed, 0);
-        setMotor(M2, speed / 2, 0);
-        setMotor(M3, speed / 2, 0);
-        setMotor(M4, speed, 0);
+        analogWrite(M1A, speed);
+        analogWrite(M2A, speed/2);
+        analogWrite(M3A, speed/2);
+        analogWrite(M4A, speed);
+        analogWrite(M1B, 0);
+        analogWrite(M2B, 0);
+        analogWrite(M3B, 0);
+        analogWrite(M4B, 0);
       }
 
       // BACKWARD + LEFT
       if (command == "BKLT") {
-        setMotor(M1, 0, speed);
-        setMotor(M2, 0, 0);
-        setMotor(M3, 0, speed);
-        setMotor(M4, 0, 0);
+        analogWrite(M1A, 0);
+        analogWrite(M2A, 0);
+        analogWrite(M3A, 0);
+        analogWrite(M4A, 0);
+        analogWrite(M1B, speed);
+        analogWrite(M2B, 0);
+        analogWrite(M3B, speed);
+        analogWrite(M4B, 0);
       }
 
       // BACKWARD + RIGHT
       if (command == "BKRT") {
-        setMotor(M1, 0, 0);
-        setMotor(M2, 0, speed);
-        setMotor(M3, 0, 0);
-        setMotor(M4, 0, speed);
+        analogWrite(M1A, 0);
+        analogWrite(M2A, 0);
+        analogWrite(M3A, 0);
+        analogWrite(M4A, 0);
+        analogWrite(M1B, 0);
+        analogWrite(M2B, speed);
+        analogWrite(M3B, 0);
+        analogWrite(M4B, speed);
       }
 
       // BACKWARD + ROTATE LEFT
       if (command == "BKRL") {
-        setMotor(M1, 0, speed / 2);
-        setMotor(M2, 0, speed);
-        setMotor(M3, 0, speed);
-        setMotor(M4, 0, speed / 2);
+        analogWrite(M1A, 0);
+        analogWrite(M2A, 0);
+        analogWrite(M3A, 0);
+        analogWrite(M4A, 0);
+        analogWrite(M1B, speed/2);
+        analogWrite(M2B, speed);
+        analogWrite(M3B, speed);
+        analogWrite(M4B, speed/2);
       }
 
       // BACKWARD + ROTATE RIGHT
       if (command == "BKRR") {
-        setMotor(M1, 0, speed);
-        setMotor(M2, 0, speed / 2);
-        setMotor(M3, 0, speed / 2);
-        setMotor(M4, 0, speed);
+        analogWrite(M1A, 0);
+        analogWrite(M2A, 0);
+        analogWrite(M3A, 0);
+        analogWrite(M4A, 0);
+        analogWrite(M1B, speed);
+        analogWrite(M2B, speed/2);
+        analogWrite(M3B, speed/2);
+        analogWrite(M4B, speed);
       }
 
       /*
@@ -370,16 +413,15 @@ void setup() {
     Serial.println("\n\nWible ESP32 Steer Freely\n");
   }
 
-  for (uint8_t i = 0; i < 4; i++) {
-    pinMode(motors[i].pinA, OUTPUT);
-    pinMode(motors[i].pinB, OUTPUT);
-    digitalWrite(motors[i].pinA, LOW);
-    digitalWrite(motors[i].pinB, LOW);
-  }
-
-  lights.begin();
-  lights.setBrightness(LED_BRIGHTNESS);
-  setLights(0, 0, 0);
+  pinMode(M1A, OUTPUT);
+  pinMode(M1B, OUTPUT);
+  pinMode(M2A, OUTPUT);
+  pinMode(M2B, OUTPUT);
+  pinMode(M3A, OUTPUT);
+  pinMode(M3B, OUTPUT);
+  pinMode(M4A, OUTPUT);
+  pinMode(M4B, OUTPUT);
+  pinMode(LED, OUTPUT);
 
   stopMotors();
 
@@ -426,9 +468,9 @@ void loop() {
   if (!deviceConnected) {
     stopMotors();
 
-    setLights(25, 0, 0);
+    digitalWrite(LED, HIGH);
     delay(250);
-    setLights(0, 0, 0);
+    digitalWrite(LED, LOW);
     delay(250);
   }
 
@@ -440,63 +482,13 @@ void loop() {
   }
 }
 
-// Drives one motor. Only one of speedA/speedB should be non-zero; speedA wins
-// if both are set. The motor's LEDC channel follows whichever pin is active.
-void setMotor(uint8_t index, uint8_t speedA, uint8_t speedB) {
-  Motor &motor = motors[index];
-
-  int8_t wanted = -1;
-  uint8_t duty = 0;
-
-  if (speedA > 0) {
-    wanted = 0;
-    duty = speedA;
-  } else if (speedB > 0) {
-    wanted = 1;
-    duty = speedB;
-  }
-
-  // Move the LEDC channel only when the direction actually changes
-  if (motor.driven != wanted) {
-    if (motor.driven >= 0) {
-      uint8_t previous = (motor.driven == 0) ? motor.pinA : motor.pinB;
-      ledcDetach(previous);
-      pinMode(previous, OUTPUT);
-      digitalWrite(previous, LOW);
-    }
-
-    if (wanted >= 0) {
-      uint8_t active = (wanted == 0) ? motor.pinA : motor.pinB;
-      if (!ledcAttachChannel(active, PWM_FREQ, PWM_RESOLUTION, motor.channel)) {
-        if (VERBOSE) {
-          Serial.print("Failed to attach PWM channel on GPIO ");
-          Serial.println(active);
-        }
-        return;
-      }
-    }
-
-    motor.driven = wanted;
-  }
-
-  if (wanted >= 0) {
-    uint8_t active = (wanted == 0) ? motor.pinA : motor.pinB;
-    uint8_t idle = (wanted == 0) ? motor.pinB : motor.pinA;
-    digitalWrite(idle, LOW);
-    ledcWrite(active, duty);
-  } else {
-    digitalWrite(motor.pinA, LOW);
-    digitalWrite(motor.pinB, LOW);
-  }
-}
-
 void stopMotors() {
-  for (uint8_t i = 0; i < 4; i++) {
-    setMotor(i, 0, 0);
-  }
-}
-
-void setLights(uint8_t r, uint8_t g, uint8_t b) {
-  lights.fill(lights.Color(r, g, b));
-  lights.show();
+  analogWrite(M1A, 0);
+  analogWrite(M1B, 0);
+  analogWrite(M2A, 0);
+  analogWrite(M2B, 0);
+  analogWrite(M3A, 0);
+  analogWrite(M3B, 0);
+  analogWrite(M4A, 0);
+  analogWrite(M4B, 0);
 }
