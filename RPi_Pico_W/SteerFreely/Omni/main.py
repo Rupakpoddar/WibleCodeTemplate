@@ -39,9 +39,8 @@ MOTION_Y_LOWER_BOUND = 128 - 32
 #
 #          A = Forward | B = Backward
 
-# Initialize Pin objects for motor driver inputs and LEDs
-LED_BUILTIN = Pin("LED", Pin.OUT)  # BLE connection status indicator
-LIGHT = Pin(28, Pin.OUT)
+# Initialize Pin objects for motor driver inputs and LED
+LED_BUILTIN = Pin("LED", Pin.OUT)
 M1A = PWM(Pin(2))
 M1B = PWM(Pin(3))
 M2A = PWM(Pin(4))
@@ -208,11 +207,11 @@ def on_rx(data):
 
     # LED ON
     if command == "LTON":
-        LIGHT.on()
+        LED_BUILTIN.on()
 
     # LED OFF
     if command == "LTOF":
-        LIGHT.off()
+        LED_BUILTIN.off()
 
     # FORWARD
     if command == "FWRD":
