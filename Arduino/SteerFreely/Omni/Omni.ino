@@ -133,6 +133,14 @@ void loop() {
   // Poll for BLE events
   BLE.poll();
 
+  // Stop the motors if no motion command has been received recently
+  if (motionActive) {
+    if (millis() - lastMotionCommandTime > MOTION_TIMEOUT_MS) {
+      motionActive = false;
+      stopMotors();
+    }
+  }
+
   // Get the central device, if any central is connected this will be non-null
   BLEDevice central = BLE.central();
 
@@ -156,13 +164,6 @@ void loop() {
       buffer[length] = '\0';
 
       handleCommand(String(buffer));
-    }
-
-    if (motionActive) {
-      if (millis() - lastMotionCommandTime > MOTION_TIMEOUT_MS) {
-        motionActive = false;
-        stopMotors();
-      }
     }
   } else {
     // No central is connected. If we were previously connected, stop the motors and restart advertising.
