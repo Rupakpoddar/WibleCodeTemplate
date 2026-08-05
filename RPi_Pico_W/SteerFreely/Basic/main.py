@@ -310,9 +310,9 @@ while True:
     if not sp.is_connected():  # Check if BLE connection is established
         stopMotors()
 
-        LED_BUILTIN.off()
-        time.sleep(0.25)
         LED_BUILTIN.on()
+        time.sleep(0.25)
+        LED_BUILTIN.off()
         time.sleep(0.25)
 
     if motion_active:
