@@ -455,7 +455,7 @@ void setup() {
   pAdvertising->addServiceUUID(UART_SERVICE_UUID);
   pAdvertising->setScanResponse(true);
   pAdvertising->setMinPreferred(0x06);
-  pAdvertising->setMinPreferred(0x12);
+  pAdvertising->setMaxPreferred(0x12);
   pAdvertising->setName("Wible");
   BLEDevice::startAdvertising();
 
