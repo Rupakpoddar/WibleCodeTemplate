@@ -6,14 +6,14 @@ Welcome to Wible — an innovative app that empowers you to harness the full pot
 
 ### 🚀 **Key Features**
 
-- **WIRELESS SERIAL MONITOR:** Seamlessly connect to your BLE-enabled microcontrollers, just like using the traditional Arduino Serial Monitor. Wible offers **bi-directional communication** with **minimal coding** and **no hardware modifications,** all within a **modern, reliable interface.**
+- **SERIAL MONITOR:** Seamlessly connect to your BLE-enabled microcontrollers, just like using the traditional Arduino Serial Monitor. Wible offers **bi-directional communication** with **minimal coding** and **no hardware modifications,** all within a **modern, reliable interface.**
 
   Watch the full tutorial on how to use Wible's Wireless Serial Monitor:  
   <a href="https://youtu.be/TXFQPdkELPQ">
     <img src="https://img.youtube.com/vi/TXFQPdkELPQ/0.jpg" alt="Watch the video" width="250">
   </a>
 
-- **OTA UPDATE OVER BLE:** Perform **Over-The-Air firmware updates** on supported microcontrollers directly from your smartphone using a `.bin` file. Just export the binary, place it on your phone, and flash it wirelessly. This feature offers **rock-solid reliability** and **blazing-fast transfer speeds**, making firmware updates effortless and efficient.
+- **OTA FIRMWARE UPDATES OVER BLE:** Perform **Over-The-Air firmware updates** on supported microcontrollers directly from your smartphone using a `.bin` file. Just export the binary, place it on your phone, and flash it wirelessly. This feature offers **rock-solid reliability** and **blazing-fast transfer speeds**, making firmware updates effortless and efficient.
 
   Watch the full tutorial on how to use Wible's OTA Update Over BLE Feature:  
   <a href="https://youtu.be/tNsKBtISKOY">
